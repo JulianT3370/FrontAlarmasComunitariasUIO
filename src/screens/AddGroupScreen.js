@@ -1,28 +1,43 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import apiService from "../services/apiService";
 
 const AddGroupScreen = ({ navigation }) => {
-  const [groupName, setGroupName] = useState('');
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
 
-  const handleAddGroup = () => {
-    if (groupName.trim() === '') {
-      alert('El nombre del grupo no puede estar vacío.');
+  const handleAddGroup = async () => {
+    if (!nombre.trim()) {
+      alert("El nombre es obligatorio");
       return;
     }
-    // Aquí puedes enviar el grupo a una API o base de datos
-    alert(`Grupo "${groupName}" agregado con éxito.`);
-    navigation.goBack();
+
+    try {
+      const data = { nombre, descripcion };
+      await apiService.createSector(data);
+      alert("Grupo creado con éxito");
+      navigation.goBack();
+    } catch (error) {
+      alert("Error al crear el grupo");
+    }
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Agregar Grupo</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre del Grupo"
-        value={groupName}
-        onChangeText={setGroupName}
+        value={nombre}
+        onChangeText={setNombre}
       />
-      <Button title="Guardar Grupo" onPress={handleAddGroup} />
+      <TextInput
+        style={styles.input}
+        placeholder="Descripción"
+        value={descripcion}
+        onChangeText={setDescripcion}
+      />
+      <Button title="Agregar Grupo" onPress={handleAddGroup} />
     </View>
   );
 };
@@ -30,14 +45,21 @@ const AddGroupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ddd",
+    borderRadius: 8,
     padding: 10,
-    marginBottom: 20,
-    borderRadius: 5,
+    marginBottom: 15,
+    fontSize: 16,
   },
 });
 

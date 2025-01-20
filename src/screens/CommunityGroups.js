@@ -1,28 +1,36 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
+import apiService from "../services/apiService";
 
-const CommunityGroups = ({ navigation }) => {
-  const groups = [
-    { id: '1', name: 'Grupo La Gasca' },
-    { id: '2', name: 'Grupo Principal A' },
-  ];
+const CommunityGroups = () => {
+  const [sectores, setSectores] = useState([]);
 
-  const renderGroup = ({ item }) => (
-    <View style={styles.groupContainer}>
-      <Text style={styles.groupText}>{item.name}</Text>
-    </View>
-  );
+  useEffect(() => {
+    const fetchSectores = async () => {
+      try {
+        const data = await apiService.getSectores();
+        setSectores(data);
+      } catch (error) {
+        console.error("Error obteniendo sectores:", error);
+      }
+    };
+
+    fetchSectores();
+  }, []);
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Grupos Comunitarios</Text>
       <FlatList
-        data={groups}
-        keyExtractor={(item) => item.id}
-        renderItem={renderGroup}
-      />
-      <Button
-        title="Agregar Nuevo Grupo"
-        onPress={() => navigation.navigate('AddGroup')}
+        data={sectores}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text style={styles.itemText}>Nombre: {item.nombre}</Text>
+            <Text style={styles.itemText}>Descripción: {item.descripcion}</Text>
+            <Text style={styles.itemText}>Número de alarmas: {item.numero_alarmas}</Text>
+          </View>
+        )}
       />
     </View>
   );
@@ -31,14 +39,22 @@ const CommunityGroups = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 20,
+    backgroundColor: "#fff",
   },
-  groupContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
-  groupText: {
+  item: {
+    padding: 15,
+    marginBottom: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+    elevation: 1,
+  },
+  itemText: {
     fontSize: 16,
   },
 });
