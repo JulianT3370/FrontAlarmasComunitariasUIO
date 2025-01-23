@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.100.171:5000/api";
+const BASE_URL = "https://sea-turtle-app-6xrtq.ondigitalocean.app/api";
 
 const API = {
   SECTORES: `${BASE_URL}/sectores`,
