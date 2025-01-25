@@ -1,13 +1,11 @@
 import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 
-function Login({navigation}) {
+function Login({ navigation }) {
     const [seePassword, setSeePassword] = useState(false);
-    const navigate = useNavigation()
 
-    const onPress = ()=>{
+    const onPress = () => {
         setSeePassword(!seePassword);
     };
 
@@ -17,33 +15,29 @@ function Login({navigation}) {
                 <Image style={styles.image} source={require("../assets/Logo.png")} />
                 <Text style={styles.title}>Iniciar Sesión</Text>
                 <Text style={styles.subtitle}>Bienvenid@</Text>
-                <View>
-                    <View style={styles.input}>
-                        <View style={styles.content}>
-                            <Text style={styles.label}>Usuario</Text>
-                            <View style={styles.inputView}>
-                                <Icon name="person" size={24} color="gray" style={styles.icon} />
-                                <TextInput
-                                    placeholder="Ingrese su usuario"
-                                    style={styles.textInput}
-                                />
-                            </View>
+                <View style={styles.inputContainer}>
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.label}>Usuario</Text>
+                        <View style={styles.inputView}>
+                            <Icon name="person" size={24} color="gray" />
+                            <TextInput
+                                placeholder="Ingrese su usuario"
+                                style={styles.textInput}
+                            />
                         </View>
                     </View>
-                    <View style={styles.input}>
-                        <View style={styles.content}>
-                            <Text style={styles.label}>Contraseña</Text>
-                            <View style={styles.inputView}>
-                                <Icon name="lock" size={24} color="gray" style={styles.icon} />
-                                <TextInput
-                                    placeholder="***********"
-                                    secureTextEntry = {!seePassword}
-                                    style={styles.textInput}
-                                />
-                                <TouchableOpacity onPress={onPress}>
-                                    <Icon name={seePassword ? "visibility-off" : "visibility"} size={24} color="gray" />
-                                </TouchableOpacity>
-                            </View>
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.label}>Contraseña</Text>
+                        <View style={styles.inputView}>
+                            <Icon name="lock" size={24} color="gray" />
+                            <TextInput
+                                placeholder="***********"
+                                secureTextEntry={!seePassword}
+                                style={styles.textInput}
+                            />
+                            <TouchableOpacity onPress={onPress}>
+                                <Icon name={seePassword ? "visibility-off" : "visibility"} size={24} color="gray" />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
@@ -59,65 +53,70 @@ const styles = StyleSheet.create({
     scrollView: {
         flexGrow: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
     },
     view: {
         justifyContent: "center",
         alignItems: "center",
-        padding: 20
+        padding: 20,
+        width: "100%",
     },
     title: {
         fontSize: 43,
         fontWeight: "bold",
-        marginBottom: 10
+        marginBottom: 10,
     },
     subtitle: {
-        marginBottom: 20
+        marginBottom: 20,
+        fontSize: 16,
+        color: "gray",
     },
-    input: {
+    inputContainer: {
         width: "100%",
-        marginBottom: 20
+        paddingHorizontal: 20,
+    },
+    inputWrapper: {
+        marginBottom: 20,
     },
     label: {
-        margin: 6,
+        marginBottom: 6,
         fontSize: 16,
-        color: "gray"
+        color: "gray",
     },
     inputView: {
         flexDirection: "row",
         alignItems: "center",
+        borderWidth: 1,
+        borderColor: "gray",
+        borderRadius: 8,
         paddingHorizontal: 10,
-        paddingVertical: 5,
-        width: "100%"
-    },
-    icon: {
-        marginRight: 10
+        height: 50,
+        backgroundColor: "#f9f9f9",
     },
     textInput: {
         flex: 1,
-        height: 40
+        fontSize: 16,
+        color: "#333",
     },
     button: {
         borderRadius: 10,
-        padding: 15,
+        paddingVertical: 15,
+        paddingHorizontal: 40,
         backgroundColor: "blue",
         alignItems: "center",
-        marginTop: 20
+        marginTop: 20,
     },
     buttonText: {
         color: "white",
-        fontWeight: "bold"
-    },
-    content: {
-        borderWidth: 1,
-        borderColor: "gray",
-        borderRadius: 5,
+        fontWeight: "bold",
+        fontSize: 16,
     },
     image: {
-        width: 300,
-        height: 300,
-        resizeMode: "contain"
-    }
+        width: 200,
+        height: 200,
+        resizeMode: "contain",
+        marginBottom: 20,
+    },
 });
 
 export default Login;
