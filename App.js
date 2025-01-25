@@ -6,6 +6,8 @@ import LocationAccess from './src/screens/LocationAccess';
 import CommunityGroups from './src/screens/CommunityGroups';
 import AddGroupScreen from './src/screens/AddGroupScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
+import Login from './src/screens/Login';
+import ListaSectores from './src/screens/ListaSectores'; // Importa ListaSectores
 
 const Stack = createStackNavigator();
 
@@ -13,13 +15,18 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="LocationAccess"
+        initialRouteName="Login"
         screenOptions={{
-          headerStyle: { backgroundColor: '#6200ee' }, // Fondo del encabezado
-          headerTintColor: '#fff', // Color del texto e íconos en el encabezado
-          headerTitleStyle: { fontWeight: 'bold' }, // Estilo del título
+          headerStyle: { backgroundColor: '#6200ee' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
         }}
       >
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ title: 'Iniciar Sesión' }}
+        />
         <Stack.Screen
           name="LocationAccess"
           component={LocationAccess}
@@ -44,6 +51,11 @@ const App = () => {
           name="Alarm"
           component={AlarmScreen}
           options={{ title: 'Activar Alarma' }}
+        />
+        <Stack.Screen
+          name="ListaSectores"
+          component={ListaSectores} // Incluye ListaSectores aquí
+          options={{ title: 'Lista de Sectores' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
