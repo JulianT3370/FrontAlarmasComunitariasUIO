@@ -54,7 +54,7 @@ const App = () => {
         />
         <Stack.Screen
           name="ListaSectores"
-          component={ListaSectores} // Incluye ListaSectores aquí
+          component={ListaSectores} // Incluye ListaSectores aquísss
           options={{ title: 'Lista de Sectores' }}
         />
       </Stack.Navigator>
