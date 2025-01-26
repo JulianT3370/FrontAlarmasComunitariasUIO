@@ -54,7 +54,7 @@ const App = () => {
         />
         <Stack.Screen
           name="ListaSectores"
-          component={ListaSectores} // Incluye ListaSectores aquísss
+          component={ListaSectores} // Se incluye sectores para alarma 
           options={{ title: 'Lista de Sectores' }}
         />
       </Stack.Navigator>
