@@ -4,9 +4,29 @@
     "slug": "frontalarma",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android"],
+    "platforms": ["ios", "android", "web"],
     "experiments": {
       "newArchEnabled": true
-    }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "build": {
+        "output": "web-build"
+      }
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.frontalarma.app"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }

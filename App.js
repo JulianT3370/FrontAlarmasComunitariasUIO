@@ -7,6 +7,8 @@ import CommunityGroups from './src/screens/CommunityGroups';
 import AddGroupScreen from './src/screens/AddGroupScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
 import Login from './src/screens/Login';
+import ListaSectores from './src/screens/ListaSectores'; // Importa ListaSectores
+import NuevaAlarma from './src/screens/NuevaAlarma';
 
 const Stack = createStackNavigator();
 
@@ -16,9 +18,9 @@ const App = () => {
       <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{
-          headerStyle: { backgroundColor: '#6200ee' }, // Fondo del encabezado
-          headerTintColor: '#fff', // Color del texto e íconos en el encabezado
-          headerTitleStyle: { fontWeight: 'bold' }, // Estilo del título
+          headerStyle: { backgroundColor: '#6200ee' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
         }}
       >
         <Stack.Screen
@@ -51,6 +53,17 @@ const App = () => {
           component={AlarmScreen}
           options={{ title: 'Activar Alarma' }}
         />
+        <Stack.Screen
+          name="ListaSectores"
+          component={ListaSectores} // Se incluye sectores para alarma 
+          options={{ title: 'Lista de Sectores' }}
+        />
+        <Stack.Screen
+          name="NuevaAlarma"
+          component={NuevaAlarma} // Se crea una nueva alarma
+          options={{ title: 'NuevaAlarma' }}
+        />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

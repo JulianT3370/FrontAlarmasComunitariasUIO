@@ -1,4 +1,4 @@
-import { ScrollView, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { ScrollView, Text, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 import MapView, { Marker } from 'react-native-maps';
@@ -6,13 +6,15 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 
 function LocationAccess({ navigation }) {
     const [location, setLocation] = useState(null);
+    const [subscription, setSubscription] = useState(null);
 
+    // Solicitar permisos y comenzar a rastrear la ubicación en tiempo real
     const requestLocationPermission = async () => {
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status === 'granted') {
                 console.log("Permiso concedido");
-                getLocation();
+                startLocationTracking();
             } else {
                 console.log("Permiso no concedido");
             }
@@ -21,40 +23,71 @@ function LocationAccess({ navigation }) {
         }
     };
 
-    useEffect(() => {
-        requestLocationPermission();
-    }, []);
-
-    const getLocation = async () => {
+    // Función para rastrear la ubicación en tiempo real
+    const startLocationTracking = async () => {
         try {
-            const { coords } = await Location.getCurrentPositionAsync({});
-            setLocation({ latitude: coords.latitude, longitude: coords.longitude });
-            console.log(coords.latitude, coords.longitude);
+            const locationSubscription = await Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    timeInterval: 3000, // Actualización cada 5 segundos
+                    distanceInterval: 1,  // Actualizar cada 10 metros
+                },
+                (newLocation) => {
+                    setLocation({
+                        latitude: newLocation.coords.latitude,
+                        longitude: newLocation.coords.longitude,
+                    });
+                    console.log("Ubicación actualizada:", newLocation.coords.latitude, newLocation.coords.longitude);
+                }
+            );
+            setSubscription(locationSubscription);
         } catch (error) {
-            alert("Error: " + error.message);
+            console.warn("Error al obtener la ubicación en tiempo real:", error);
         }
     };
+
+    // Efecto para solicitar permisos al montar el componente
+    useEffect(() => {
+        requestLocationPermission();
+
+        // Limpiar la suscripción cuando se desmonte el componente
+        return () => {
+            if (subscription) {
+                subscription.remove();
+            }
+        };
+    }, []);
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {location ? (
                 <MapView
                     style={styles.map}
-                    initialRegion={{
+                    region={{
                         latitude: location.latitude,
                         longitude: location.longitude,
                         latitudeDelta: 0.002,
                         longitudeDelta: 0.002,
-                    }}>
+                    }}
+                >
                     <Marker coordinate={location} />
                 </MapView>
-            ) : null}
+            ) : (
+                <Text style={styles.text}>Obteniendo ubicación...</Text>
+            )}
             <Text style={styles.text}>
                 Alarmas Comunitarias registradas en su sector
             </Text>
-            <TouchableOpacity style={styles.iconContainer} onPress={() => { navigation.navigate("AddGroup") }}>
-                <Icon name="add" size={40} color="white" />
-            </TouchableOpacity>
+
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.iconContainer} onPress={() => { navigation.navigate("AddGroup") }}>
+                    <Icon name="add" size={40} color="white" />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.newAlarmButton} onPress={() => navigation.navigate("NuevaAlarma")}>
+                    <Text style={styles.newAlarmText}>Nueva Alarma</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 }
@@ -64,17 +97,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "white",
     },
-    locationInfo: {
-        marginBottom: 20,
-    },
-    button: {
-        backgroundColor: 'blue',
-        padding: 10,
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: 'white',
-    },
     map: {
         height: 400,
         width: '100%',
@@ -82,6 +104,13 @@ const styles = StyleSheet.create({
     text: {
         padding: 10,
         fontSize: 15,
+        textAlign: "center",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20,
     },
     iconContainer: {
         width: 60,
@@ -90,8 +119,18 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 10,
-        alignSelf: "center",
-        marginTop: 20,
+        marginRight: 20,
+    },
+    newAlarmButton: {
+        backgroundColor: "blue",
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+    },
+    newAlarmText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
 

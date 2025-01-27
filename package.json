@@ -6,25 +6,32 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
-    "start": "react-native start",
-    "test": "jest"
+    "start": "expo start",
+    "web": "expo start --web",
+    "build": "expo export:web",
+    "test": "jest",
+    "serve": "npx serve web-build -l 8080"
   },
   "dependencies": {
+    "@expo/webpack-config": "^0.17.2",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
     "axios": "^1.7.9",
-    "expo": "^52.0.25",
+    "expo": "~52.0.26",
     "expo-location": "~18.0.5",
-    "FrontAlarmaComunitariaUIO": "file:",
     "react": "18.3.1",
+    "react-dom": "^18.3.1",
     "react-native": "0.76.6",
     "react-native-dialog": "^9.3.0",
     "react-native-gesture-handler": "~2.20.2",
-    "react-native-maps": "^1.20.1",
+    "react-native-maps": "^1.18.0",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
-    "react-native-vector-icons": "^10.2.0"
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-web": "^0.19.13",
+    "expo-checkbox": "~4.0.1",
+    "@expo/metro-runtime": "~4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -38,6 +45,7 @@
     "@react-native/metro-config": "0.76.6",
     "@react-native/typescript-config": "0.76.6",
     "@types/react": "^18.2.6",
+    "@types/react-native": "^0.73.0",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.6.3",
     "babel-preset-expo": "^12.0.6",
@@ -45,9 +53,9 @@
     "jest": "^29.6.3",
     "prettier": "2.8.8",
     "react-test-renderer": "18.3.1",
-    "typescript": "5.0.4"
+    "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=18"
+    "node": "18.x"
   }
 }
