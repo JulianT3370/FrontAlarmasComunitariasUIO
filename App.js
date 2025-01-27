@@ -14,13 +14,18 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="Home"
         screenOptions={{
           headerStyle: { backgroundColor: '#6200ee' }, // Fondo del encabezado
           headerTintColor: '#fff', // Color del texto e íconos en el encabezado
           headerTitleStyle: { fontWeight: 'bold' }, // Estilo del título
         }}
       >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: 'Inicio' }}
+        />
         <Stack.Screen
           name="Login"
           component={Login}
@@ -30,11 +35,6 @@ const App = () => {
           name="LocationAccess"
           component={LocationAccess}
           options={{ title: 'Acceso a Ubicación' }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: 'Inicio' }}
         />
         <Stack.Screen
           name="CommunityGroups"
