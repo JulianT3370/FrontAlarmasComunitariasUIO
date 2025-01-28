@@ -87,7 +87,11 @@ function LocationAccess({ navigation }) {
                 <TouchableOpacity style={styles.newAlarmButton} onPress={() => navigation.navigate("NuevaAlarma")}>
                     <Text style={styles.newAlarmText}>Nueva Alarma</Text>
                 </TouchableOpacity>
+
             </View>
+            <TouchableOpacity style={styles.microphone} onPress={() => navigation.navigate("Microphone")}>
+                <Icon name="mic" size={40} color="blue" />
+            </TouchableOpacity>
         </ScrollView>
     );
 }
@@ -110,6 +114,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
+        flexWrap: 1,
         marginTop: 20,
     },
     iconContainer: {
@@ -131,6 +136,11 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
         fontWeight: "bold",
+    },
+    microphone: {
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 30,
     },
 });
 

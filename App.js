@@ -9,6 +9,7 @@ import AlarmScreen from './src/screens/AlarmScreen';
 import Login from './src/screens/Login';
 import ListaSectores from './src/screens/ListaSectores'; // Importa ListaSectores
 import NuevaAlarma from './src/screens/NuevaAlarma';
+import Microphone from './src/screens/Microphone';
 
 const Stack = createStackNavigator();
 
@@ -62,6 +63,11 @@ const App = () => {
           name="NuevaAlarma"
           component={NuevaAlarma} // Se crea una nueva alarma
           options={{ title: 'NuevaAlarma' }}
+        />
+        <Stack.Screen
+          name="Microphone"
+          component={Microphone} // Grabar voz para pasarla a texto
+          options={{ title: 'Microfono' }}
         />
         
       </Stack.Navigator>
