@@ -1,14 +1,32 @@
 import { ScrollView, Text, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Circle } from 'react-native-maps';
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 function LocationAccess({ navigation }) {
     const [location, setLocation] = useState(null);
     const [subscription, setSubscription] = useState(null);
+    const [alarms, setAlarms] = useState([
+        { id: 1, latitude: -34.6037, longitude: -58.3816 }, // Ejemplo: Alarma en Buenos Aires
+        { id: 2, latitude: -34.605, longitude: -58.38 },    // Otra alarma cercana
+    ]);
+    const radius = 100; // Radio en metros
 
-    // Solicitar permisos y comenzar a rastrear la ubicación en tiempo real
+    const haversine = (lat1, lon1, lat2, lon2) => {
+        const toRad = (x) => (x * Math.PI) / 180;
+        const R = 6371; // Radio de la Tierra en km
+
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // Distancia en km
+        return distance * 1000; // Convertir a metros
+    };
+
     const requestLocationPermission = async () => {
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -23,14 +41,13 @@ function LocationAccess({ navigation }) {
         }
     };
 
-    // Función para rastrear la ubicación en tiempo real
     const startLocationTracking = async () => {
         try {
             const locationSubscription = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.High,
-                    timeInterval: 3000, // Actualización cada 5 segundos
-                    distanceInterval: 1,  // Actualizar cada 10 metros
+                    timeInterval: 3000, // Actualización cada 3 segundos
+                    distanceInterval: 1,  // Actualizar cada 1 metro
                 },
                 (newLocation) => {
                     setLocation({
@@ -46,17 +63,27 @@ function LocationAccess({ navigation }) {
         }
     };
 
-    // Efecto para solicitar permisos al montar el componente
     useEffect(() => {
         requestLocationPermission();
 
-        // Limpiar la suscripción cuando se desmonte el componente
         return () => {
             if (subscription) {
                 subscription.remove();
             }
         };
     }, []);
+
+    const nearbyAlarms = location
+        ? alarms.filter((alarm) => {
+              const distance = haversine(
+                  location.latitude,
+                  location.longitude,
+                  alarm.latitude,
+                  alarm.longitude
+              );
+              return distance <= radius;
+          })
+        : [];
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -71,6 +98,19 @@ function LocationAccess({ navigation }) {
                     }}
                 >
                     <Marker coordinate={location} />
+                    <Circle
+                        center={location}
+                        radius={radius}
+                        strokeColor="rgba(0, 0, 255, 0.5)"
+                        fillColor="rgba(0, 0, 255, 0.2)"
+                    />
+                    {nearbyAlarms.map((alarm) => (
+                        <Marker
+                            key={alarm.id}
+                            coordinate={{ latitude: alarm.latitude, longitude: alarm.longitude }}
+                            pinColor="red"
+                        />
+                    ))}
                 </MapView>
             ) : (
                 <Text style={styles.text}>Obteniendo ubicación...</Text>
