@@ -1,6 +1,3 @@
-import { ScrollView, Text, StyleSheet, TouchableOpacity, View } from "react-native";
-import * as Location from "expo-location";
-import { useState, useEffect } from "react";
 import {
     ScrollView,
     Text,
@@ -13,7 +10,8 @@ import {
 import * as Location from "expo-location";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import styles from "../styles/LocationAccessStyles";
+import { useState, useEffect} from "react";
+import { StyleSheet } from "react-native";
 
 function LocationAccess({ navigation }) {
     const [location, setLocation] = useState(null);
