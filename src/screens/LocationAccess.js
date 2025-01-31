@@ -12,6 +12,7 @@ import * as Location from "expo-location";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
+import { useState, useEffect } from "react";
 import styles from "../styles/LocationAccessStyles";
 
 function LocationAccess() {
@@ -151,7 +152,7 @@ function LocationAccess() {
           </View>
           <TouchableOpacity
             style={styles.generateButton}
-            onPress={() => navigation.navigate("GenerarAlarma")}
+            onPress={() => navigation.navigate("CamaraIP")}
           >
             <Text style={styles.generateButtonText}>Generar</Text>
           </TouchableOpacity>
@@ -161,52 +162,5 @@ function LocationAccess() {
   );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "white",
-    },
-    map: {
-        height: 400,
-        width: '100%',
-    },
-    text: {
-        padding: 10,
-        fontSize: 15,
-        textAlign: "center",
-    },
-    buttonContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        flexWrap: 1,
-        marginTop: 20,
-    },
-    iconContainer: {
-        width: 60,
-        height: 60,
-        backgroundColor: "blue",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 10,
-        marginRight: 20,
-    },
-    newAlarmButton: {
-        backgroundColor: "blue",
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 10,
-    },
-    newAlarmText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    microphone: {
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 30,
-    },
-});
 
 export default LocationAccess;
