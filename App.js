@@ -60,6 +60,7 @@ const App = () => {
           component={ListaSectores} // Se incluye sectores para alarma 
           options={{ title: 'Lista de Sectores' }}
         />
+<<<<<<< HEAD
         <Stack.Screen
           name="NuevaAlarma"
           component={NuevaAlarma} // Se crea una nueva alarma
@@ -76,6 +77,23 @@ const App = () => {
           options={{ title: 'CamaraIP' }}
         />
         
+=======
+         <Stack.Screen
+          name="AlarmaDetalle"
+          component={AlarmaDetalle}
+          options={{ title: 'Detalle de la Alarma' }}
+        />
+        <Stack.Screen
+          name="NuevaAlarma"
+          component={NuevaAlarma}
+          options={{ title: 'Nueva Alarma' }}
+        />
+        <Stack.Screen
+          name="GenerarAlarma"
+          component={GenerarAlarma}
+          options={{ title: 'Generar Alarma' }}
+        />
+>>>>>>> origin/Leonardo
       </Stack.Navigator>
     </NavigationContainer>
   );
