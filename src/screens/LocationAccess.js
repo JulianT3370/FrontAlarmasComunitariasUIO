@@ -97,6 +97,10 @@ function LocationAccess({ navigation }) {
                     <Text style={styles.newAlarmText}>Nueva Alarma</Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity style={styles.newAlarmButton} onPress={() => navigation.navigate("CamaraIP")}>
+                    <Text style={styles.newAlarmText}>Camara IP</Text>
+                </TouchableOpacity>
+
             </View>
             <TouchableOpacity style={styles.microphone} onPress={() => navigation.navigate("Microphone")}>
                 <Icon name="mic" size={40} color="blue" />

@@ -10,6 +10,7 @@ import Login from './src/screens/Login';
 import ListaSectores from './src/screens/ListaSectores'; // Importa ListaSectores
 import NuevaAlarma from './src/screens/NuevaAlarma';
 import Microphone from './src/screens/Microphone';
+import CamaraIP from './src/screens/CamaraIP';
 
 const Stack = createStackNavigator();
 
@@ -68,6 +69,11 @@ const App = () => {
           name="Microphone"
           component={Microphone} // Grabar voz para pasarla a texto
           options={{ title: 'Microfono' }}
+        />
+        <Stack.Screen
+          name="CamaraIP"
+          component={CamaraIP} 
+          options={{ title: 'CamaraIP' }}
         />
         
       </Stack.Navigator>
