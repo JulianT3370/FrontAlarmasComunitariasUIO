@@ -1,16 +1,28 @@
 from dotenv import load_dotenv
 import os
+import google.generativeai as genai
 from flask import Flask, request, jsonify
 from google.cloud import speech_v1 as speech
 from pydub import AudioSegment
 from pydub.utils import which
+import b2sdk.v2
 # Trabajar con archivos wav
 import wave
 from flask_cors import CORS
+from datetime import datetime
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
+def account_credentials():
+    info = b2sdk.v2.InMemoryAccountInfo()
+    api = b2sdk.v2.B2Api(info)
+    appKeyId = os.getenv("ACCOUNT_ID")
+    appKey = os.getenv("APPLICATION_KEY")
+    api.authorize_account("production", appKeyId, appKey)
+    return api
+
 # Usado para manipular archivos de audio, en este caso convertir formatos
 # Busca ffmpeg en el sistema para trabajar con distintos formatos de audio
 AudioSegment.ffmpeg = which("ffmpeg")
@@ -49,22 +61,70 @@ def transcribir(input_file, sample_rate):
 @app.route("/upload", methods=["POST"])
 def upload():
     try:
+        fecha_hora_actual = datetime.now().strftime("%Y%m%d_%H%M%S")
         # Obtener el archivo subido
         file = request.files["file"]
         file_path = os.path.join("recordings", file.filename)
         file.save(file_path)
 
+        # Convertir a WAV (mono)
         audio = AudioSegment.from_file(file_path, format="m4a")
-        wav_path = os.path.join("recordings", file.filename.replace(".m4a", ".wav"))
+        wav_path = file_path.replace(".m4a", ".wav")
         audio.set_channels(1).export(wav_path, format="wav")
-        sample_Rate = getSampleRate(wav_path)
-        data = transcribir(wav_path, sample_Rate)
+
+        # Subir a bucket
+        api = account_credentials()
+        bucket = api.get_bucket_by_name(os.getenv("BUCKET_NAME"))
+
+        audioName = "audio-"+fecha_hora_actual+".wav"
+        with open(wav_path, "rb") as wav_file:
+            bucket.upload_bytes(wav_file.read(), audioName)
+
+        try:
+            # Descargar desde el bucket
+            local_file_name = os.path.join("recordings", audioName)
+            downloaded_bytes = bucket.download_file_by_name(audioName)
+            # Guardar el archivo descargado
+            downloaded_bytes.save_to(local_file_name);
+            
+            # Obtener sample rate y transcribir
+            sample_rate = getSampleRate(local_file_name)
+            data = transcribir(local_file_name, sample_rate)
+
+            # Limpiar archivos locales
+            os.remove(file_path)
+            os.remove(wav_path)
+            os.remove(local_file_name)
+
+            return jsonify(data)
         
-        return jsonify(data)
+        except Exception as e:
+            return jsonify({"error": f"Error en la descarga/transcripción: {str(e)}"}), 500
+        
     except Exception as e:
-        # Loguear el error y devolver una respuesta con el mensaje de error
         app.logger.error(f"Error processing the file: {e}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
+@app.route("/text", methods=["POST"])
+def textoTitulo():
+    text = request.json.get("text")
+    api_key = os.getenv("API_KEY")
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-2.0-flash-exp")
+    prompt = f"""
+        Analiza la siguiente descripción de una situación:
+        "{text}"
+
+        1. Verifica si el contenido está relacionado con seguridad comunitaria.
+        - Si **no está relacionado**, responde únicamente con una cadena vacía: "" (sin explicaciones).
+        
+        2. Si el contenido **sí está relacionado**, genera un título de máximo 3 palabras que resuma el tema principal.
+        - Devuelve **únicamente el título**, sin ninguna explicación, contexto ni formato adicional.
+        - Asegúrate de que el título sea **conciso y específico**, evitando frases genéricas o ambiguas.
+    """
+    response = model.generate_content(prompt)
+    return jsonify(response.text)
 
 
 if __name__ == "__main__":

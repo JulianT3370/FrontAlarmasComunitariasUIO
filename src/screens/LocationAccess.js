@@ -131,7 +131,7 @@ function LocationAccess() {
           ))}
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => navigation.navigate("NuevaAlarma")}
+            onPress={() => navigation.navigate("CamaraIP")}
           >
             <Icon name="add" size={40} color="white" />
           </TouchableOpacity>
@@ -146,7 +146,7 @@ function LocationAccess() {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate("Microphone")}>
               <Icon name="mic" size={30} color="blue" />
             </TouchableOpacity>
           </View>

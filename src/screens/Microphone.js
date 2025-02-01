@@ -1,13 +1,15 @@
 import { Audio } from 'expo-av';
-import { TouchableOpacity} from "react-native";
+import { TouchableOpacity, Text, View} from "react-native";
 import { useState, useEffect } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import axios from 'axios';
+import CamaraIP from './CamaraIP';
 
 function Microphone({ navigation }) {
     const [permiso, setPermiso] = useState(false);
     const [audio, setAudio] = useState(null);
-    const [uri, setUri] = useState(null)
+    const [uri, setUri] = useState(null);
+    const [title, setTitle] = useState("");
 
     const getPermiso = async () => {
         const status = await Audio.requestPermissionsAsync();
@@ -78,14 +80,15 @@ function Microphone({ navigation }) {
         formData.append('file', file);
         try {
             console.log("Enviando archivo...");
-            await axios.post("http://192.168.0.104:5000/upload", formData, {
+            await axios.post("http://192.168.95.109:5000/upload", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
             })
             .then((response)=>{
                 console.log('Archivo enviado correctamente');
-                console.log(response.data)
+                console.log(response.data);
+                sendText(response.data);
             })
             .catch((error)=>{
                 console.log(error)
@@ -96,10 +99,38 @@ function Microphone({ navigation }) {
         }
     };
 
+    const sendText = async(text)=>{
+        await axios.post("http://192.168.95.109:5000/text",{
+            text: text
+        },{
+            headers:{
+                "Content-Type" : "application/json"
+            }
+        })
+        .then((response) => {
+            if(response.data == ""){
+                console.log("no se relaciona con seguridad comunitaria")
+            }
+            else{
+                console.log(response.data)
+                setTitle(response.data)
+            }
+        })
+        .catch((error)=>{
+            console.log(error)
+        })
+    }
+
     return (
         <>
             <TouchableOpacity onPress={stopRec}>
                 <Icon name="mic" size={40} color="blue" />
+                {title !== "" ? 
+                    <View>
+                        <Text>{title}</Text>
+                        <CamaraIP/>
+                    </View>
+                : <Text>No se ha enviado alertas</Text>}
             </TouchableOpacity>
         </>
     )
