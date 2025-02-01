@@ -1,13 +1,31 @@
-import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { StyleSheet, View, Text } from 'react-native';
 
 function CamaraIP() {
     return (
-            <WebView
+        <View style={styles.container}>
+            <Text style={styles.title}>Cámara Activada</Text>
+            <WebView 
                 source={{ uri: 'http://dispo:dispo@10.167.174.104:8080/video' }}
-                style={{ marginTop: 20 }}
+                style={styles.webview}
             />
-    )
+        </View>
+    );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 10,
+    },
+    webview: {
+        flex: 1,
+    }
+});
 
 export default CamaraIP;
