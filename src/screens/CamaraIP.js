@@ -6,7 +6,7 @@ function CamaraIP() {
         <View style={styles.container}>
             <Text style={styles.title}>Cámara Activada</Text>
             <WebView 
-                source={{ uri: 'http://dispo:dispo@10.167.174.104:8080/video' }}
+                source={{ uri: 'http://dispo:dispo@192.168.0.104:8080/video' }}
                 style={styles.webview}
             />
         </View>

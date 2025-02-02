@@ -2,13 +2,12 @@ import { Audio } from 'expo-av';
 import { TouchableOpacity, Text, View} from "react-native";
 import { useState, useEffect } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import axios from 'axios';
+import { axiosApi } from '../services/axiosFlask';
 import CamaraIP from './CamaraIP';
 
 function Microphone({ navigation }) {
     const [permiso, setPermiso] = useState(false);
     const [audio, setAudio] = useState(null);
-    const [uri, setUri] = useState(null);
     const [title, setTitle] = useState("");
 
     const getPermiso = async () => {
@@ -27,6 +26,8 @@ function Microphone({ navigation }) {
     useEffect(() => {
         getPermiso();
     }, []);
+
+    
 
     const initGrab = async () => {
         try {
@@ -57,8 +58,6 @@ function Microphone({ navigation }) {
             // Se almacena la ruta donde se almaceno el archivo de audio
             const newUri = audio.getURI();
             console.log('Grabación terminada, URI:', newUri);
-            // Asignar el path a una variable de estado
-            setUri(newUri);
             const fileUri = newUri;
             // Obtiene el nombre del audio eliminando el path anterior al mismo
             const fileName = fileUri.split('/').pop();
@@ -80,7 +79,7 @@ function Microphone({ navigation }) {
         formData.append('file', file);
         try {
             console.log("Enviando archivo...");
-            await axios.post("http://192.168.95.109:5000/upload", formData, {
+            await axiosApi.post("/upload", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
@@ -100,7 +99,7 @@ function Microphone({ navigation }) {
     };
 
     const sendText = async(text)=>{
-        await axios.post("http://192.168.95.109:5000/text",{
+        await axiosApi.post("/text",{
             text: text
         },{
             headers:{

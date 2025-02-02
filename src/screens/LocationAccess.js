@@ -6,7 +6,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
+  // Keyboard,
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, Circle } from "react-native-maps";
@@ -14,13 +14,16 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import styles from "../styles/LocationAccessStyles";
+import { axiosApi } from "../services/axiosFlask";
 
 function LocationAccess() {
   const navigation = useNavigation();
   const [location, setLocation] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [mapRegion, setMapRegion] = useState(null);
-  const [inputFocused, setInputFocused] = useState(false);
+  // const [inputFocused, setInputFocused] = useState(false);
+  const [text, setText] = useState("");
+  const [title, setTitle] = useState("");
   const radius = 20; // 20 metros
 
   // Alarmas predefinidas
@@ -41,6 +44,29 @@ function LocationAccess() {
       console.log("Permiso de ubicación no concedido");
     }
   };
+
+  const getTitle = async (text) => {
+    console.log("Enviando descripción")
+    await axiosApi.post("/text", {
+      text: text
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then((response) => {
+        if (response.data == "") {
+          console.log("no se relaciona con seguridad comunitaria")
+        }
+        else {
+          console.log(response.data)
+          setTitle(response.data)
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
   const startLocationTracking = async () => {
     const locationSubscription = await Location.watchPositionAsync(
@@ -143,18 +169,23 @@ function LocationAccess() {
             <TextInput
               style={styles.input}
               placeholder="Mensaje..."
-              onFocus={() => setInputFocused(true)}
-              onBlur={() => setInputFocused(false)}
+              value={text}
+              onChangeText={(value) => setText(value)}
             />
-            <TouchableOpacity onPress={()=>navigation.navigate("Microphone")}>
+            <TouchableOpacity onPress={() => navigation.navigate("Microphone")}>
               <Icon name="mic" size={30} color="blue" />
             </TouchableOpacity>
           </View>
           <TouchableOpacity
             style={styles.generateButton}
-            onPress={() => navigation.navigate("CamaraIP")}
+            onPress={() => {
+              if (text) {
+                getTitle(text)
+              }
+            }}
           >
             <Text style={styles.generateButtonText}>Generar</Text>
+            {title ? <Text>{title}</Text> : <Text>Aún no hay título</Text>}
           </TouchableOpacity>
         </View>
       </ScrollView>
