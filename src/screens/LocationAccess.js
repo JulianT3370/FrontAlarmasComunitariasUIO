@@ -15,25 +15,28 @@ import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import styles from "../styles/LocationAccessStyles";
 import { axiosApi } from "../services/axiosFlask";
+import Dialog from "react-native-dialog";
 
 function LocationAccess() {
   const navigation = useNavigation();
   const [location, setLocation] = useState(null);
-  const [subscription, setSubscription] = useState(null);
+  // const [subscription, setSubscription] = useState(null);
   const [mapRegion, setMapRegion] = useState(null);
   // const [inputFocused, setInputFocused] = useState(false);
   const [text, setText] = useState("");
-  const [title, setTitle] = useState("");
-  const radius = 20; // 20 metros
+  const [datos, setDatos] = useState(null);
+  const [dialog, setDialog] = useState(false)
+  const [dialogError, setDialogError] = useState(false)
+  const radius = 45;
 
   // Alarmas predefinidas
   const [alarms, setAlarms] = useState([]);
 
   useEffect(() => {
     requestLocationPermission();
-    return () => {
-      if (subscription) subscription.remove();
-    };
+    // return () => {
+    //   if (subscription) subscription.remove();
+    // };
   }, []);
 
   const requestLocationPermission = async () => {
@@ -55,12 +58,13 @@ function LocationAccess() {
       }
     })
       .then((response) => {
-        if (response.data == "") {
+        const res = response.data.trim()
+        if (res == "No está relacionado.") {
           console.log("no se relaciona con seguridad comunitaria")
+          setDialogError(true)
         }
         else {
-          console.log(response.data)
-          setTitle(response.data)
+          enviarAlarma(res)
         }
       })
       .catch((error) => {
@@ -69,7 +73,7 @@ function LocationAccess() {
   }
 
   const startLocationTracking = async () => {
-    const locationSubscription = await Location.watchPositionAsync(
+    await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 3000,
@@ -95,22 +99,47 @@ function LocationAccess() {
               id: 1,
               name: "La Gasca",
               address: "1671 North Avenue, Tucson, AZ",
-              latitude: userLocation.latitude + 0.0001,
-              longitude: userLocation.longitude + 0.0001,
+              latitude: -0.367159,
+              longitude: -78.547700,
             },
             {
               id: 2,
               name: "Principal A",
               address: "1234 Desert Road, Tucson, AZ",
-              latitude: userLocation.latitude - 0.0001,
-              longitude: userLocation.longitude - 0.0001,
+              latitude: -0.367000,
+              longitude: -78.547500,
             },
           ]);
         }
       }
     );
-    setSubscription(locationSubscription);
+    // setSubscription(locationSubscription);
   };
+
+  const handleCancel = () => {
+    setDatos(null)
+    setText("")
+    setDialog(false);
+  };
+
+  const enviarAlarma = async (title) => {
+    const data = {
+      "sectores": alarms,
+      "coordenadas": location,
+      "titulo": title
+    }
+    // console.log(data)
+    await axiosApi.post("/haversine", {
+      data: data
+    }, {}).then((response) => {
+      console.log(response.data)
+      setDatos(response.data)
+      setDialog(true)
+    })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
   return (
     <KeyboardAvoidingView
@@ -131,9 +160,10 @@ function LocationAccess() {
               <Marker
                 key={alarm.id}
                 coordinate={{ latitude: alarm.latitude, longitude: alarm.longitude }}
-                pinColor="red"
-                onPress={() => navigation.navigate("AlarmaDetalle", { alarm })}
-              />
+              // onPress={() => navigation.navigate("AlarmaDetalle", { alarm })}
+              >
+                <Icon name="alarm" size={40} color="blue" />
+              </Marker>
             ))}
           </MapView>
         ) : (
@@ -184,8 +214,37 @@ function LocationAccess() {
               }
             }}
           >
+            {datos ?
+              <Dialog.Container visible={dialog}>
+                <Dialog.Title>{datos["title"]}</Dialog.Title>
+                <Dialog.Description>
+                  <Text>La alerta se envió a los siguientes sectores:</Text>
+                  {alarms
+                    .filter((itemA) => {
+                      return datos["sectores"].some(
+                        (item) => itemA["name"] === item["name"] && item["status"] === true
+                      );
+                    })
+                    .map((itemA, index) => (
+                      <Text key={index}> {itemA["name"]}</Text>
+                    ))}
+                  <Text style={styles.origen}>
+                    <Text>{"\n"}Origen</Text>{"\n"}
+                    Latitud: {datos["origen"]["latitude"]}{"\n"}
+                    Longitud: {datos["origen"]["longitude"]}
+                  </Text>
+                </Dialog.Description>
+                <Dialog.Button label="Aceptar" onPress={handleCancel} />
+              </Dialog.Container>
+              : null}
+            <Dialog.Container visible={dialogError}>
+              <Dialog.Title>Error</Dialog.Title>
+              <Dialog.Description>
+                <Text>El texto proporcionado no se relaciona con seguridad comunitaria.</Text>
+              </Dialog.Description>
+              <Dialog.Button label="Aceptar" onPress={() => setDialogError(false)} />
+            </Dialog.Container>
             <Text style={styles.generateButtonText}>Generar</Text>
-            {title ? <Text>{title}</Text> : <Text>Aún no hay título</Text>}
           </TouchableOpacity>
         </View>
       </ScrollView>

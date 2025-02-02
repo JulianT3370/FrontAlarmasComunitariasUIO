@@ -10,6 +10,8 @@ import b2sdk.v2
 import wave
 from flask_cors import CORS
 from datetime import datetime
+from haversine import formula
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -117,7 +119,7 @@ def textoTitulo():
         "{text}"
 
         1. Verifica si el contenido está relacionado con seguridad comunitaria.
-        - Si **no está relacionado**, responde únicamente con una cadena vacía: "" (sin explicaciones).
+        - Si **no está relacionado**, responde con: No está relacionado.
         
         2. Si el contenido **sí está relacionado**, genera un título de máximo 3 palabras que resuma el tema principal.
         - Devuelve **únicamente el título**, sin ninguna explicación, contexto ni formato adicional.
@@ -126,6 +128,29 @@ def textoTitulo():
     response = model.generate_content(prompt)
     return jsonify(response.text)
 
+@app.route("/haversine", methods = ["POST"])
+def calcularDistancia():
+    data = request.json.get("data")
+    coordenadas = data["coordenadas"]
+    sectores = data["sectores"]
+    titulo = data["titulo"]
+    distancias = []
+    datos = {}
+    for sector in sectores:
+        result = {}
+        lat = sector["latitude"]
+        lon = sector["longitude"]
+        clat = coordenadas["latitude"]
+        clon = coordenadas["longitude"]
+        distancia = formula(lat, lon, clat, clon, 6371)
+        result["name"] = sector["name"]
+        result["status"] = distancia <= 45
+        distancias.append(result)
+        # result[sector["name"]+"-distancia"] = distancia
+    datos["sectores"] = distancias
+    datos["title"] = titulo
+    datos["origen"] = coordenadas
+    return jsonify(datos)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
