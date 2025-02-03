@@ -5,6 +5,7 @@ import ListaSectores from "../screens/ListaSectores";
 import ActivarAlarma from "../screens/ActivarAlarma";
 import Login from "../screens/Login";
 
+
 const AppNavigation = () => {
   return (
     <Router>

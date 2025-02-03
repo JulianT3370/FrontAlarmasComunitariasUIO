@@ -7,8 +7,10 @@ import CommunityGroups from './src/screens/CommunityGroups';
 import AddGroupScreen from './src/screens/AddGroupScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
 import Login from './src/screens/Login';
-import ListaSectores from './src/screens/ListaSectores'; // Importa ListaSectores
-import NuevaAlarma from './src/screens/NuevaAlarma';
+import ListaSectores from './src/screens/ListaSectores'; 
+import AgregarAlarma from "./src/screens/AgregarAlarma";
+import AlarmaDetalle from "./src/screens/AlarmaDetalle";// Importa ListaSectores
+
 
 const Stack = createStackNavigator();
 
@@ -59,9 +61,14 @@ const App = () => {
           options={{ title: 'Lista de Sectores' }}
         />
         <Stack.Screen
-          name="NuevaAlarma"
-          component={NuevaAlarma} // Se crea una nueva alarma
-          options={{ title: 'NuevaAlarma' }}
+          name="AgregarAlarma"
+          component={AgregarAlarma} // Se crea una nueva alarma
+          options={{ title: 'AgregarAlarma' }}
+        />
+         <Stack.Screen
+          name="AlarmaDetalle"
+          component={AlarmaDetalle} // Se crea una nueva alarma
+          options={{ title: 'AlarmaDetalle' }}
         />
         
       </Stack.Navigator>
