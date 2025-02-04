@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
-import styles from "../styles/LocationAccessStyles";
+import styles from "../styles/AgregarAlarmaStyles";
 
 function AgregarAlarma() {
   const navigation = useNavigation();
