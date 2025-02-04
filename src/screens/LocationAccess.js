@@ -33,7 +33,12 @@ function LocationAccess() {
   const [alarms, setAlarms] = useState([]);
 
   useEffect(() => {
-    requestLocationPermission();
+    if (Platform.OS === 'web') {
+      return <Text>Map component is not supported on Web</Text>;
+    }
+    else{
+      requestLocationPermission();
+    }
     // return () => {
     //   if (subscription) subscription.remove();
     // };
@@ -160,7 +165,7 @@ function LocationAccess() {
               <Marker
                 key={alarm.id}
                 coordinate={{ latitude: alarm.latitude, longitude: alarm.longitude }}
-              // onPress={() => navigation.navigate("AlarmaDetalle", { alarm })}
+                onPress={() => navigation.navigate("AlarmaDetalle", { alarm })}
               >
                 <Icon name="alarm" size={40} color="blue" />
               </Marker>
@@ -187,6 +192,7 @@ function LocationAccess() {
           ))}
           <TouchableOpacity
             style={styles.addButton}
+            // onPress={() => navigation.navigate("AgregarAlarma")}
             onPress={() => navigation.navigate("CamaraIP")}
           >
             <Icon name="add" size={40} color="white" />

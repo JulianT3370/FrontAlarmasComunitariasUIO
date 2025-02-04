@@ -107,7 +107,7 @@ function Microphone({ navigation }) {
             }
         })
         .then((response) => {
-            if(response.data == ""){
+            if (response == "No está relacionado.") {
                 console.log("no se relaciona con seguridad comunitaria")
             }
             else{

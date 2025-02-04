@@ -11,6 +11,7 @@ import wave
 from flask_cors import CORS
 from datetime import datetime
 from haversine import formula
+import subprocess
 
 load_dotenv()
 
@@ -59,6 +60,23 @@ def transcribir(input_file, sample_rate):
             data["transcripcion"] = result.alternatives[0].transcript
             data["valor"] = result.alternatives[0].confidence
     return data
+
+@app.route('/process-video', methods=['POST'])
+def process_video():
+    rtsp_url = request.json.get('rtsp_url')
+    output_file = request.json.get('output_file')
+    if not rtsp_url or not output_file:
+        return jsonify({'error': 'Faltan parámetros: rtsp_url y output_file'}), 400
+    command = [
+        'ffmpeg', '-i', rtsp_url, '-c:v', 'copy', '-c:a', 'aac', output_file
+    ]
+    try:
+        subprocess.run(command, check=True)
+        return jsonify({'message': f'Video procesado con éxito y guardado en {output_file}'}), 200
+
+    except subprocess.CalledProcessError as e:
+        # En caso de error en la ejecución de FFmpeg
+        return jsonify({'error': 'Error al procesar el video', 'details': str(e)}), 500
 
 @app.route("/upload", methods=["POST"])
 def upload():
