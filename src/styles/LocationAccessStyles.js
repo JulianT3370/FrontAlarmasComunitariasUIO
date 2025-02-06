@@ -1,124 +1,119 @@
-import { StyleSheet } from "react-native";
+// LocationAccessStyles.js
+import { StyleSheet } from 'react-native';
 
-export default StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9F9F9",
-    paddingHorizontal: 20,
+    backgroundColor: '#fff'
   },
   scrollContainer: {
-    paddingBottom: 20,
+    padding: 16,
+    backgroundColor: '#fff'
   },
   map: {
-    flex: 1,
-    height: 400,
-    width: "100%",
+    width: '100%',
+    height: 300,
     borderRadius: 10,
-    marginVertical: 10,
+    marginBottom: 16,
+  },
+  text: {
+    textAlign: 'center',
+    marginVertical: 16,
+    fontSize: 16,
+    color: '#333'
   },
   alarmBox: {
-    backgroundColor: "#FFFFFF",
-    margin: 20,
-    padding: 15,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginVertical: 16,
+    padding: 16,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10
   },
   alarmTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333'
+  },
+  alarmItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 10,
-    color: "#333",
+    backgroundColor: '#fff',
+    padding: 8,
+    borderRadius: 8,
+    // Sombras para iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    // Elevación para Android
+    elevation: 2,
   },
   alarmItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#DDD",
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   alarmName: {
-    fontWeight: "bold",
     fontSize: 16,
-    color: "#007AFF",
+    fontWeight: 'bold',
+    color: '#333'
   },
   alarmAddress: {
-    color: "#777",
     fontSize: 14,
+    color: '#666'
+  },
+  deleteButton: {
+    padding: 8,
   },
   addButton: {
-    alignSelf: "center",
-    marginTop: 20,
-    backgroundColor: "#007AFF",
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    backgroundColor: 'blue',
+    borderRadius: 50,
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    alignSelf: 'center'
   },
   generateAlarm: {
-    padding: 20,
-    marginBottom: 20,
-    backgroundColor: "#FFF",
+    marginVertical: 16,
+    padding: 16,
+    backgroundColor: '#f8f8f8',
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 5,
   },
   generateTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 15,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333'
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    backgroundColor: "#FFF",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 10,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 12,
   },
   input: {
     flex: 1,
-    height: 45,
+    paddingVertical: 8,
     fontSize: 16,
-    color: "#333",
+    color: '#333',
   },
   generateButton: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 12,
-    marginTop: 15,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    elevation: 4,
+    backgroundColor: 'blue',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
   },
   generateButtonText: {
-    color: "white",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold'
   },
 });
+
+export default styles;
