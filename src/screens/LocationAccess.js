@@ -14,7 +14,7 @@ import MapView, { Marker, Circle } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import styles from "../styles/LocationAccessStyles"; // Asegúrate de definir aquí los estilos
+import styles from "../styles/LocationAccessStyles"; // Estilos para Location
 import { axiosApi } from "../services/axiosFlask";
 
 function LocationAccess() {
