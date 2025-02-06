@@ -43,7 +43,7 @@ export default StyleSheet.create({
   alarmName: {
     fontWeight: "bold",
     fontSize: 16,
-    color: "#007AFF",
+    color: "black",
   },
   alarmAddress: {
     color: "#777",
