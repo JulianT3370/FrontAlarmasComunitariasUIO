@@ -122,7 +122,6 @@ export default StyleSheet.create({
     fontWeight: "bold",
   },
 
-  /* 🔹 ESTILOS PARA AGREGAR ALARMA 🔹 */
   formContainer: {
     width: "100%",
     backgroundColor: "#FFF",
@@ -177,7 +176,6 @@ export default StyleSheet.create({
     color: "#555",
   },
 
-  /* 🔹 ESTILOS PARA CÁMARA IP 🔹 */
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",

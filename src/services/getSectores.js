@@ -2,7 +2,7 @@ import { axiosApi } from "./axiosFlask";
 
 export const getSectores = async () => {
     try {
-        const response = await axiosApi.get("/get_sectores");
+        const response = await axiosApi.get("/fgetSectores");
         return response.data;
     } catch (error) {
         if (error.response) {

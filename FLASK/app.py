@@ -11,15 +11,26 @@ import wave
 from flask_cors import CORS
 from datetime import datetime
 from haversine import formula
-import subprocess
-import mysql.connector
-from connection.conn import db_config
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+#import mysql.connector
+#from connection.conn import db_config
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIAL"))
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+# Usado para manipular archivos de audio, en este caso convertir formatos
+# Busca ffmpeg en el sistema para trabajar con distintos formatos de audio
+AudioSegment.ffmpeg = which("ffmpeg")
+client = speech.SpeechClient.from_service_account_file(os.getenv("CREDENTIAL"))
 
 def account_credentials():
     info = b2sdk.v2.InMemoryAccountInfo()
@@ -28,11 +39,6 @@ def account_credentials():
     appKey = os.getenv("APPLICATION_KEY")
     api.authorize_account("production", appKeyId, appKey)
     return api
-
-# Usado para manipular archivos de audio, en este caso convertir formatos
-# Busca ffmpeg en el sistema para trabajar con distintos formatos de audio
-AudioSegment.ffmpeg = which("ffmpeg")
-client = speech.SpeechClient.from_service_account_file(os.getenv("CREDENTIAL"))
 
 # Obtener la tasa de muestreo del archivo .wav
 def getSampleRate(file):
@@ -147,7 +153,7 @@ def calcularDistancia():
         clat = coordenadas["latitude"]
         clon = coordenadas["longitude"]
         distancia = formula(float(lat), float(lon), clat, clon, 6371)
-        result["name"] = sector["nombre"]
+        result["name"] = sector["id"]
         if(distancia > 45):
             continue
         result["status"] = distancia <= 45
@@ -160,72 +166,52 @@ def calcularDistancia():
     datos["origen"] = coordenadas
     return jsonify(datos)
 
-@app.route("/get_sectores", methods = ["GET"])
-def getSectores():
-    connection = mysql.connector.connect(**db_config)
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM sectores")
-    sectores = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return jsonify(sectores)
+@app.route("/firebase", methods=["POST"])
+def firebase():
+    data = request.json.get("data")
+    nombre = data["nombre"]
 
-@app.route("/sector", methods = ["POST"])
-def sector():
-        connection = mysql.connector.connect(**db_config)
-        cursor = connection.cursor(dictionary=True)
-        
-        data = request.json.get("data")
-        nombre = data["nombre"]
-        cursor.execute("SELECT * from sectores WHERE nombre = %s", (nombre,))
-        result = cursor.fetchone()
-        if(result):
-            cursor.close()
-            connection.close()
-            return jsonify({"message" : "El sector ya se encuentra registrado"}), 400
+    sector = db.collection("sectores").document(nombre)
+    validSec = sector.get()
 
+    if(validSec.exists):
+        return jsonify({ "message" : "El sector com el nombre " + nombre + " ya se encuentra registrado." }), 400
+    else:
         latitud = data["latitud"]
         longitud = data["longitud"]
-        ipCam = data["ip"]
+
         if(data["usr"] and data["pass"]):
+            ipCam = data["ip"]
             usr = data["usr"]
             pas = data["pass"]
-            query = "INSERT INTO sectores (nombre, latitud, longitud, ip_camara, usuario, password) VALUES (%s, %s, %s, %s, %s, %s)"
-            values = (nombre, latitud, longitud, ipCam, usr, pas)
-            cursor.execute(query, values)
-            connection.commit()
+            sector.set({ "latitud" : latitud, "longitud" : longitud, "ip_camara" : ipCam, "usuario" : usr, "password" : pas })
         else:
-            query = "INSERT INTO sectores (nombre, latitud, longitud, ip_camara) VALUES (%s, %s, %s, %s)"
-            values = (nombre, latitud, longitud, ipCam)
-            cursor.execute(query, values)
-            connection.commit()
-        cursor.close()
-        connection.close()
+            sector.set({ "latitud" : latitud, "longitud" : longitud })
         return jsonify({"message" : "Se ha registrado el sector"})
 
-@app.route("/alarma", methods=["POST"])
-def alarma():
-    connection = mysql.connector.connect(**db_config)
-    cursor = connection.cursor(dictionary=True)
+@app.route("/fgetSectores", methods = ["GET"])
+def getSectoresFirebase():
+    sectores_ref = db.collection("sectores")
+    docs = sectores_ref.stream()
+    sectores = []
+    for doc in docs:
+        sectores.append({ "id": doc.id, **doc.to_dict() })
+
+    return jsonify(sectores)
+
+@app.route("/alarma", methods = ["POST"])
+def fetchAlarm():
     data = request.json.get("data")
     titulo = data["title"]
     latitud = data["origen"]["latitude"]
     longitud = data["origen"]["longitude"]
-    query = "INSERT INTO alarmas (titulo, latitud, longitud) VALUES (%s, %s, %s)"
-    values = (titulo, latitud, longitud)
-    cursor.execute(query, values)
-    alarma_id = cursor.lastrowid
+    alarma = db.collection("alarmas").document()
+    alarma.set({ "titulo" : titulo, "latitud" : float(latitud), "longitud" : float(longitud) })
     sectores = data["sectores"]
-    queryAS = "INSERT INTO alarma_sectores (alarma_id, sector_id) VALUES (%s, %s)"
+    print(sectores)
     for sector in sectores:
-        queryS = "SELECT id FROM sectores WHERE nombre = %s"
-        valuesS = (sector["name"],)
-        cursor.execute(queryS, valuesS)
-        idSector = cursor.fetchone()
-        cursor.execute(queryAS, (alarma_id, idSector["id"]))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        sector_alarma = db.collection("sector_alarma").document()
+        sector_alarma.set({ "alarma_id": alarma.id, "sector_name": sector["name"] })
     return jsonify({"message" : "Se ha registrado el alarma"})
 
 if __name__ == "__main__":

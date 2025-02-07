@@ -26,6 +26,7 @@ export default function LocationAccess() {
         requestLocationPermission();
         const fetchSectores = async () => {
             const data = await getSectores()
+            console.log(data)
             setSectores(data)
         }
         fetchSectores()
@@ -144,11 +145,11 @@ export default function LocationAccess() {
                             {sectores
                                 .filter((itemA) => {
                                     return datos["sectores"].some(
-                                        (item) => itemA["nombre"] === item["name"] && item["status"] === true
+                                        (item) => itemA["id"] === item["name"] && item["status"] === true
                                     );
                                 })
                                 .map((itemA, index) => (
-                                    <Text key={index}> {itemA["nombre"]}</Text>
+                                    <Text key={index}> {itemA["id"]}</Text>
                                 ))}
                             <Text style={styles.origen}>
                                 <Text>{"\n"}Origen</Text>{"\n"}
@@ -183,10 +184,10 @@ export default function LocationAccess() {
                             strokeColor="rgba(0, 0, 255, 0.5)"
                             fillColor="rgba(0, 0, 255, 0.2)"
                         />
-                        {sectores.map((sector) => (
+                        {sectores.map((sector, index) => (
                             <Marker
-                                key={sector.id}
-                                coordinate={{ latitude: parseFloat(sector.latitud), longitude: parseFloat(sector.longitud) }}
+                                key={index}
+                                coordinate={{ latitude: sector.latitud, longitude: sector.longitud }}
                                 onPress={() => navigation.navigate("AlarmaDetalle", { sector })}
                             >
                                 <Icon name="alarm" size={20} color="blue" />
@@ -199,15 +200,15 @@ export default function LocationAccess() {
 
                 <View style={styles.alarmBox}>
                     <Text style={styles.alarmTitle}>Alarmas Comunitarias Registradas en el sector:</Text>
-                    {sectores.map((sector) => (
+                    {sectores.map((sector, index) => (
                         <TouchableOpacity
-                            key={sector.id}
+                            key={index}
                             style={styles.alarmItem}
                             onPress={() => navigation.navigate("AlarmaDetalle", { sector })}
                         >
                             <Icon name="notifications" size={20} color="blue" />
                             <View>
-                                <Text style={styles.alarmName}>{sector.nombre}</Text>
+                                <Text style={styles.alarmName}>{sector.id}</Text>
                             </View>
                         </TouchableOpacity>
                     ))}
