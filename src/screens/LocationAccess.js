@@ -26,7 +26,6 @@ export default function LocationAccess() {
         requestLocationPermission();
         const fetchSectores = async () => {
             const data = await getSectores()
-            console.log(data)
             setSectores(data)
         }
         fetchSectores()
