@@ -1,18 +1,17 @@
-// AgregarAlarma.js
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import * as Location from "expo-location";
+import { handleSector } from "../services/handleSector";
+import DialogScreen from "../partials/DialogScreen";
 
-const AgregarAlarma = () => {
+const AgregarSector = () => {
   const route = useRoute();
-  const navigation = useNavigation();
-  // Se recibe el callback para agregar la alarma y, opcionalmente, la ubicación actual
-  const { onAddAlarm, currentLocation } = route.params || {};
+  // Se recibe el callback para agregar el sector y, opcionalmente, la ubicación actual
+  const { onAddSector, currentLocation } = route.params || {};
 
-  // Estados para almacenar los datos del formulario de la alarma
+  // Estados para almacenar los datos del formulario del sector
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
   // Estados para la latitud y longitud (que serán obtenidas automáticamente)
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
@@ -21,6 +20,8 @@ const AgregarAlarma = () => {
   const [cameraIP, setCameraIP] = useState("");
   const [cameraUser, setCameraUser] = useState("");
   const [cameraPassword, setCameraPassword] = useState("");
+
+  const [visible, setVisible] = useState(false);
 
   // Al montar el componente, se obtiene la ubicación actual.
   useEffect(() => {
@@ -43,30 +44,27 @@ const AgregarAlarma = () => {
     }
   }, [currentLocation]);
 
-  const handleAddAlarm = () => {
-    if (name && address && latitude && longitude) {
-      // Se crea el objeto de la alarma, incluyendo la ubicación exacta de creación
-      const newAlarm = {
-        id: Date.now(), // Se usa el timestamp para generar un id único
+  const handleAddSector = () => {
+    if (name && latitude && longitude) {
+      const newSector = {
         name,
-        address,
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
       };
 
       // Si se ingresó información para la cámara, se agrega el objeto "camera"
       if (cameraIP || cameraUser || cameraPassword) {
-        newAlarm.camera = {
+        newSector.camera = {
           ip: cameraIP,
           user: cameraUser,
           password: cameraPassword,
         };
       }
-
-      if (onAddAlarm) {
-        onAddAlarm(newAlarm);
+      handleSector({newSector})
+      setVisible(true)
+      if (onAddSector) {
+        onAddSector(newSector);
       }
-      navigation.goBack();
     } else {
       Alert.alert("Campos incompletos", "Por favor, completa todos los campos requeridos");
     }
@@ -74,22 +72,17 @@ const AgregarAlarma = () => {
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 20, marginBottom: 10 }}>Agregar Nueva Alarma</Text>
+      <DialogScreen 
+        titulo="Notificación"
+        descripcion="Se ha registrado el sector!"
+        status={visible}
+        eventCancel={()=>setVisible(false)}
+      />
+      <Text style={{ fontSize: 20, marginBottom: 10 }}>Agregar Nuevo Sector</Text>
       <TextInput
-        placeholder="Nombre de la Alarma"
+        placeholder="Nombre del sector"
         value={name}
         onChangeText={setName}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 10,
-          marginBottom: 10,
-        }}
-      />
-      <TextInput
-        placeholder="Dirección"
-        value={address}
-        onChangeText={setAddress}
         style={{
           borderWidth: 1,
           borderColor: "#ccc",
@@ -165,7 +158,7 @@ const AgregarAlarma = () => {
       />
 
       <TouchableOpacity
-        onPress={handleAddAlarm}
+        onPress={handleAddSector}
         style={{
           backgroundColor: "blue",
           padding: 10,
@@ -174,11 +167,11 @@ const AgregarAlarma = () => {
         }}
       >
         <Text style={{ color: "white", textAlign: "center" }}>
-          Guardar Alarma
+          Guardar Sector
         </Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export default AgregarAlarma;
+export default AgregarSector;

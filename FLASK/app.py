@@ -166,10 +166,10 @@ def calcularDistancia():
     datos["origen"] = coordenadas
     return jsonify(datos)
 
-@app.route("/firebase", methods=["POST"])
-def firebase():
+@app.route("/sendSector", methods=["POST"])
+def sendSector():
     data = request.json.get("data")
-    nombre = data["nombre"]
+    nombre = data["name"]
 
     sector = db.collection("sectores").document(nombre)
     validSec = sector.get()
@@ -177,13 +177,13 @@ def firebase():
     if(validSec.exists):
         return jsonify({ "message" : "El sector com el nombre " + nombre + " ya se encuentra registrado." }), 400
     else:
-        latitud = data["latitud"]
-        longitud = data["longitud"]
-
-        if(data["usr"] and data["pass"]):
-            ipCam = data["ip"]
-            usr = data["usr"]
-            pas = data["pass"]
+        latitud = data["latitude"]
+        longitud = data["longitude"]
+        camara_data = data.get("camera")
+        if(camara_data):
+            ipCam = data["camera"]["ip"]
+            usr = data["camera"]["user"]
+            pas = data["camera"]["password"]
             sector.set({ "latitud" : latitud, "longitud" : longitud, "ip_camara" : ipCam, "usuario" : usr, "password" : pas })
         else:
             sector.set({ "latitud" : latitud, "longitud" : longitud })

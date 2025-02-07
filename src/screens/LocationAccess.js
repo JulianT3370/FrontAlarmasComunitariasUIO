@@ -29,7 +29,7 @@ export default function LocationAccess() {
             setSectores(data)
         }
         fetchSectores()
-    }, []);
+    }, [sectores]);
 
     const requestLocationPermission = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -213,8 +213,8 @@ export default function LocationAccess() {
                     ))}
                     <TouchableOpacity
                         style={styles.addButton}
-                        // onPress={() => navigation.navigate("AgregarAlarma")}
-                        onPress={() => navigation.navigate("CamaraIP")}
+                        onPress={() => navigation.navigate("AgregarAlarma")}
+                        //onPress={() => navigation.navigate("CamaraIP")}
                     >
                         <Icon name="add" size={40} color="white" />
                     </TouchableOpacity>

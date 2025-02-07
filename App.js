@@ -7,7 +7,7 @@ import Login from './src/screens/Login';
 import NuevaAlarma from './src/screens/NuevaAlarma';
 import Microphone from './src/screens/Microphone';
 import CamaraIP from './src/screens/CamaraIP';
-import AgregarAlarma from "./src/screens/AgregarAlarma";
+import AgregarSector from "./src/screens/AgregarSector";
 import AlarmaDetalle from "./src/screens/AlarmaDetalle";
 
 const Stack = createStackNavigator();
@@ -40,7 +40,7 @@ const App = () => {
         />
         <Stack.Screen
           name="AgregarAlarma"
-          component={AgregarAlarma} // Se crea una nueva alarma
+          component={AgregarSector} // Se crea un nuevo sector
           options={{ title: 'AgregarAlarma' }}
         />
          <Stack.Screen
