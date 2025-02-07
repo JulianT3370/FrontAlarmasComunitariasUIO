@@ -114,6 +114,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold'
   },
+
+  //microfono
+  micButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 15,
+    // Opcional: agregar sombra para iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    // Elevación para Android
+    elevation: 5,
+  },
+  // ... otros estilos
+
+
 });
 
 export default styles;

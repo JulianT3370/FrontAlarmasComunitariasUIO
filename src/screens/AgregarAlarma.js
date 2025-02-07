@@ -44,7 +44,7 @@ const AgregarAlarma = () => {
   }, [currentLocation]);
 
   const handleAddAlarm = () => {
-    if (name && address && latitude && longitude) {
+    if (name && latitude && longitude) {
       // Se crea el objeto de la alarma, incluyendo la ubicación exacta de creación
       const newAlarm = {
         id: Date.now(), // Se usa el timestamp para generar un id único
@@ -86,17 +86,7 @@ const AgregarAlarma = () => {
           marginBottom: 10,
         }}
       />
-      <TextInput
-        placeholder="Dirección"
-        value={address}
-        onChangeText={setAddress}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          padding: 10,
-          marginBottom: 10,
-        }}
-      />
+  
       {/* Los campos de latitud y longitud se obtienen automáticamente y son de solo lectura */}
       <TextInput
         placeholder="Latitud"

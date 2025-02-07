@@ -1,5 +1,5 @@
 // LocationAccess.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ScrollView,
   Text,
@@ -8,13 +8,15 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  Animated,
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import styles from "../styles/LocationAccessStyles"; // Estilos para Location
+import styles from "../styles/LocationAccessStyles"; // Estilos de Localización
 import { axiosApi } from "../services/axiosFlask";
 
 function LocationAccess() {
@@ -26,6 +28,12 @@ function LocationAccess() {
   const [title, setTitle] = useState("");
   const [alarms, setAlarms] = useState([]);
   const radius = 20; // Radio para el círculo en el mapa
+
+  // Estados y referencia para la simulación de grabación
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const recordingInterval = useRef(null);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   // Cargar alarmas persistidas desde AsyncStorage al iniciar
   useEffect(() => {
@@ -45,6 +53,7 @@ function LocationAccess() {
 
     return () => {
       if (subscription) subscription.remove();
+      if (recordingInterval.current) clearInterval(recordingInterval.current);
     };
   }, []);
 
@@ -154,6 +163,51 @@ function LocationAccess() {
     saveAlarms(updatedAlarms);
   };
 
+  // Función para iniciar la animación de pulso
+  const startPulse = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.5,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  // Función para detener la animación de pulso
+  const stopPulse = () => {
+    pulseAnim.stopAnimation();
+    pulseAnim.setValue(1);
+  };
+
+  // Función para iniciar la grabación mientras se mantiene presionado
+  const handleStartRecording = () => {
+    setIsRecording(true);
+    setRecordingTime(0);
+    startPulse(); // Inicia la animación de pulso
+    recordingInterval.current = setInterval(() => {
+      setRecordingTime((prevTime) => prevTime + 1);
+    }, 1000);
+  };
+
+  // Función para detener la grabación al soltar el botón
+  const handleStopRecording = () => {
+    if (recordingInterval.current) {
+      clearInterval(recordingInterval.current);
+    }
+    stopPulse(); // Detiene la animación de pulso
+    setIsRecording(false);
+    Alert.alert("Alarma Generada", `Duración: ${recordingTime} segundos`);
+    setRecordingTime(0);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -236,8 +290,17 @@ function LocationAccess() {
               value={text}
               onChangeText={(value) => setText(value)}
             />
-            <TouchableOpacity onPress={() => navigation.navigate("Microphone")}>
-              <Icon name="mic" size={30} color="blue" />
+            <TouchableOpacity
+              onPressIn={handleStartRecording}
+              onPressOut={handleStopRecording}
+              style={[
+                styles.micButton,
+                { backgroundColor: isRecording ? "red" : "blue" },
+              ]}
+            >
+              <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                <Icon name={isRecording ? "stop" : "mic"} size={30} color="#fff" />
+              </Animated.View>
             </TouchableOpacity>
           </View>
           <TouchableOpacity
