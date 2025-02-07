@@ -148,7 +148,7 @@ export default function LocationAccess() {
                                     );
                                 })
                                 .map((itemA, index) => (
-                                    <Text key={index}> {itemA["id"]}</Text>
+                                    <Text key={index} style={{ fontWeight: "bold" }}> "{itemA["id"]}" </Text>
                                 ))}
                             <Text style={styles.origen}>
                                 <Text>{"\n"}Origen</Text>{"\n"}
