@@ -1,9 +1,10 @@
-import { ScrollView, Text, View, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, TextInput, KeyboardAvoidingView, StatusBar } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import styles from "../styles/LocationAccessStyles";
 import { axiosApi } from "../services/axiosFlask";
 import DialogScreen from "../partials/DialogScreen";
@@ -22,14 +23,19 @@ export default function LocationAccess() {
     const [sectores, setSectores] = useState([]);
     const radius = 45;
 
+    const fetchSectores = async () => {
+        const data = await getSectores()
+        setSectores(data)
+    }
+
+    useFocusEffect(() => {
+        fetchSectores()
+    });
+
     useEffect(() => {
         requestLocationPermission();
-        const fetchSectores = async () => {
-            const data = await getSectores()
-            setSectores(data)
-        }
         fetchSectores()
-    }, [sectores]);
+    }, []);
 
     const requestLocationPermission = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -130,10 +136,15 @@ export default function LocationAccess() {
     };
 
     return (
-        <KeyboardAvoidingView
+        <View
             style={styles.container}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={"height"}
         >
+            <StatusBar
+                backgroundColor="#6200ee"
+                barStyle="light-content"
+                hidden={false}
+            />
             {datos ?
                 <DialogScreen
                     status={dialog}
@@ -214,38 +225,44 @@ export default function LocationAccess() {
                     <TouchableOpacity
                         style={styles.addButton}
                         onPress={() => navigation.navigate("AgregarAlarma")}
-                        //onPress={() => navigation.navigate("CamaraIP")}
+                    //onPress={() => navigation.navigate("CamaraIP")}
                     >
                         <Icon name="add" size={40} color="white" />
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.generateAlarm}>
-                    <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Mensaje..."
-                            value={text}
-                            onChangeText={(value) => setText(value)}
-                        />
-                        <TouchableOpacity onPress={() => navigation.navigate("Microphone")}>
-                            <Icon name="mic" size={30} color="blue" />
-                        </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity
-                        style={styles.generateButton}
-                        onPress={() => {
-                            if (text) {
-                                getTitle(text)
-                            }
-                        }}
-                    >
-                        <Text style={styles.generateButtonText}>Generar</Text>
+                <KeyboardAvoidingView
+                    behavior='height'
+                    //keyboardVerticalOffset={60}
+                >
+                    <View style={styles.generateAlarm}>
+                        <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Mensaje..."
+                                value={text}
+                                onChangeText={(value) => setText(value)}
+                            />
+                            <TouchableOpacity onPress={() => navigation.navigate("Microphone")}>
+                                <Icon name="mic" size={30} color="blue" />
+                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity
+                            style={styles.generateButton}
+                            onPress={() => {
+                                if (text) {
+                                    getTitle(text)
+                                }
+                            }}
+                        >
+                            <Text style={styles.generateButtonText}>Generar</Text>
 
-                    </TouchableOpacity>
-                </View>
+                        </TouchableOpacity>
+
+                    </View>
+                </KeyboardAvoidingView>
             </ScrollView>
-        </KeyboardAvoidingView>
+        </View>
     );
 }

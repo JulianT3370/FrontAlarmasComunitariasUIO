@@ -1,8 +1,13 @@
-import { View, Image, TouchableOpacity, Text } from 'react-native';
+import { View, Image, TouchableOpacity, Text, StatusBar } from 'react-native';
 
 export default function App({ navigation }) {
   return (
     <View style={style.view}>
+      <StatusBar
+        backgroundColor="#6200ee"
+        barStyle="light-content" 
+        hidden={false}           
+      />
       <Image source={require("../assets/Logo.png")} />
 
       <TouchableOpacity style={style.button} onPress={() => navigation.navigate("Login")}>

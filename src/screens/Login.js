@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet, StatusBar } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useState } from "react";
 
@@ -11,6 +11,11 @@ function Login({ navigation }) {
 
     return (
         <ScrollView contentContainerStyle={styles.scrollView}>
+            <StatusBar
+                backgroundColor="#6200ee"
+                barStyle="light-content" 
+                hidden={false}           
+            />
             <View style={styles.view}>
                 <Image style={styles.image} source={require("../assets/Logo.png")} />
                 <Text style={styles.title}>Iniciar Sesión</Text>

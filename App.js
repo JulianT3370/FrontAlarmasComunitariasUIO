@@ -4,7 +4,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import LocationAccess from './src/screens/LocationAccess';
 import Login from './src/screens/Login';
-import NuevaAlarma from './src/screens/NuevaAlarma';
 import Microphone from './src/screens/Microphone';
 import CamaraIP from './src/screens/CamaraIP';
 import AgregarSector from "./src/screens/AgregarSector";
@@ -18,9 +17,7 @@ const App = () => {
       <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{
-          headerStyle: { backgroundColor: '#6200ee' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: 'bold' },
+          headerShown : false
         }}
       >
         <Stack.Screen
@@ -56,11 +53,6 @@ const App = () => {
         <Stack.Screen
           name="CamaraIP"
           component={CamaraIP} 
-          options={{ title: 'CamaraIP' }}
-        />
-        <Stack.Screen
-          name="NuevaAlarma"
-          component={NuevaAlarma} 
           options={{ title: 'CamaraIP' }}
         />
       </Stack.Navigator>
