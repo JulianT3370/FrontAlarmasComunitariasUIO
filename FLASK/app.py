@@ -70,10 +70,8 @@ def textoTitulo():
     prompt = f"""
         Analiza la siguiente descripción de una situación:
         "{text}"
-
         1. Verifica si el contenido está relacionado con seguridad comunitaria.
         - Si **no está relacionado**, responde con: No está relacionado.
-        
         2. Si el contenido **sí está relacionado**, genera un título de máximo 3 palabras que resuma el tema principal.
         - Devuelve **únicamente el título**, sin ninguna explicación, contexto ni formato adicional.
         - Asegúrate de que el título sea **conciso y específico**, evitando frases genéricas o ambiguas.

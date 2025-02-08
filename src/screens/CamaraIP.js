@@ -10,8 +10,8 @@ function CamaraIP() {
         <Text>IP Webcam</Text>
       </View>
       <WebView
-        source={{ uri: 'http://dispo:dispo@10.216.220.111:8080' }}
-        // source={{ uri: 'http://190.210.250.149:91' }}
+        //source={{ uri: 'http://dispo:dispo@10.216.220.111:8080' }}
+        source={{ uri: 'http://62.131.207.209:8080/' }}
         style={styles.webview}
       />
     </View>

@@ -9,6 +9,7 @@ import styles from "../styles/LocationAccessStyles";
 import { axiosApi } from "../services/axiosFlask";
 import DialogScreen from "../partials/DialogScreen";
 import { getSectores } from "../services/getSectores";
+import CamaraIP from "./CamaraIP";
 
 export default function LocationAccess() {
     const navigation = useNavigation();
@@ -131,6 +132,7 @@ export default function LocationAccess() {
         setDatos(null)
         setText("")
         setDialog(false);
+        navigation.navigate("CamaraIP")
     };
 
     return (
@@ -185,7 +187,7 @@ export default function LocationAccess() {
                             <Marker
                                 key={index}
                                 coordinate={{ latitude: sector.latitud, longitude: sector.longitud }}
-                                onPress={() => navigation.navigate("AlarmaDetalle", { sector })}
+                                onPress={() => navigation.navigate("SectorDetalle", { sector })}
                             >
                                 <Icon name="alarm" size={20} color="blue" />
                             </Marker>
@@ -201,7 +203,7 @@ export default function LocationAccess() {
                         <TouchableOpacity
                             key={index}
                             style={styles.alarmItem}
-                            onPress={() => navigation.navigate("AlarmaDetalle", { sector })}
+                            onPress={() => navigation.navigate("SectorDetalle", { sector })}
                         >
                             <Icon name="notifications" size={20} color="blue" />
                             <View>
@@ -211,7 +213,7 @@ export default function LocationAccess() {
                     ))}
                     <TouchableOpacity
                         style={styles.addButton}
-                        onPress={() => navigation.navigate("AgregarAlarma")}
+                        onPress={() => navigation.navigate("AgregarSector")}
                     //onPress={() => navigation.navigate("CamaraIP")}
                     >
                         <Icon name="add" size={40} color="white" />

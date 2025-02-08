@@ -24,7 +24,7 @@ def transcribir(input_file, sample_rate):
         config = speech.RecognitionConfig(
             # Configuració para archivos .wav sin comprimir
             encoding = speech.RecognitionConfig.AudioEncoding.LINEAR16,
-            # Ajustar a la misma tasa de muestre de un archivo .wav
+            # Ajustar a la misma tasa de muestreo de un archivo .wav
             sample_rate_hertz = sample_rate,
             # Lenguaje en el que se esta implementando la api
             language_code = "es-ES"
