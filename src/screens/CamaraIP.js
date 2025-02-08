@@ -11,7 +11,11 @@ function CamaraIP() {
       </View>
       <WebView
         //source={{ uri: 'http://dispo:dispo@10.216.220.111:8080' }}
+<<<<<<< HEAD
          source={{ uri: 'http://192.168.18.8:91' }}
+=======
+        source={{ uri: 'http://62.131.207.209:8080/' }}
+>>>>>>> origin/jorge
         style={styles.webview}
       />
     </View>

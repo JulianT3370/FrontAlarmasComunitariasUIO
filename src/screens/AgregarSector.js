@@ -4,8 +4,10 @@ import { useRoute } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { handleSector } from "../services/handleSector";
 import DialogScreen from "../partials/DialogScreen";
+import { useNavigation } from "@react-navigation/native";
 
 const AgregarSector = () => {
+    const navigation = useNavigation();
     const route = useRoute();
     // Se recibe el callback para agregar el sector y, opcionalmente, la ubicación actual
     const { onAddSector, currentLocation } = route.params || {};
@@ -22,6 +24,7 @@ const AgregarSector = () => {
     const [cameraPassword, setCameraPassword] = useState("");
 
     const [visible, setVisible] = useState(false);
+    const [message, setMessage] = useState("");
 
     // Al montar el componente, se obtiene la ubicación actual.
     useEffect(() => {
@@ -52,7 +55,7 @@ const AgregarSector = () => {
                 longitude: parseFloat(longitude),
             };
 
-            // Si se ingresó información para la cámara, se agrega el objeto "camera"
+            // Validación de la cámara
             if (cameraIP || cameraUser || cameraPassword) {
                 newSector.camera = {
                     ip: cameraIP,
@@ -60,10 +63,17 @@ const AgregarSector = () => {
                     password: cameraPassword,
                 };
             }
-            handleSector({ newSector })
-            setVisible(true)
-            if (onAddSector) {
-                onAddSector(newSector);
+
+            try {
+                const response = handleSector({ newSector });
+                setMessage(response);
+                setVisible(true);
+                if (onAddSector) {
+                    onAddSector(newSector);
+                }
+            } catch (error) {
+                setMessage(error.message);
+                setVisible(true);
             }
         } else {
             Alert.alert("Campos incompletos", "Por favor, completa todos los campos requeridos");
@@ -74,9 +84,12 @@ const AgregarSector = () => {
         <View style={{ flex: 1, padding: 20 }}>
             <DialogScreen
                 titulo="Notificación"
-                descripcion="Se ha registrado el sector!"
+                descripcion={message}
                 status={visible}
-                eventCancel={() => setVisible(false)}
+                eventCancel={() => {
+                    setVisible(false)
+                    navigation.goBack()
+                }}
             />
             <Text style={{ fontSize: 20, marginBottom: 10 }}>Agregar Nuevo Sector</Text>
             <KeyboardAvoidingView

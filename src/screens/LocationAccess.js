@@ -1,29 +1,17 @@
-import { 
-    ScrollView, 
-    Text, 
-    View, 
-    TouchableOpacity, 
-    TextInput, 
-    KeyboardAvoidingView, 
-    StatusBar, 
-    Modal, 
-    StyleSheet,
-    Animated
-  } from "react-native";
-  import * as Location from "expo-location";
-  import MapView, { Marker, Circle } from "react-native-maps";
-  import Icon from "react-native-vector-icons/MaterialIcons";
-  import { useNavigation } from "@react-navigation/native";
-  import { useState, useEffect, useCallback, useRef } from "react";
-  import { useFocusEffect } from "@react-navigation/native";
-  import styles from "../styles/LocationAccessStyles";
-  import { axiosApi } from "../services/axiosFlask";
-  import DialogScreen from "../partials/DialogScreen";
-  import { getSectores } from "../services/getSectores";
-  import { Audio } from "expo-av";
-  
-  // Componente principal: LocationAccess
-  export default function LocationAccess() {
+import { ScrollView, Text, View, TouchableOpacity, TextInput, KeyboardAvoidingView, StatusBar } from "react-native";
+import * as Location from "expo-location";
+import MapView, { Marker, Circle } from "react-native-maps";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
+import { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import styles from "../styles/LocationAccessStyles";
+import { axiosApi } from "../services/axiosFlask";
+import DialogScreen from "../partials/DialogScreen";
+import { getSectores } from "../services/getSectores";
+import CamaraIP from "./CamaraIP";
+
+export default function LocationAccess() {
     const navigation = useNavigation();
     const [location, setLocation] = useState(null);
     const [mapRegion, setMapRegion] = useState(null);
@@ -37,16 +25,16 @@ import {
     const radius = 45;
   
     const fetchSectores = async () => {
-      const data = await getSectores();
-      setSectores(data);
-    };
-  
+        const data = await getSectores()
+        setSectores(data)
+    }
+
     useFocusEffect(
-      useCallback(() => {
-        fetchSectores();
-      }, [])
+        useCallback(() => {
+            fetchSectores();
+        }, [])
     );
-  
+
     useEffect(() => {
       requestLocationPermission();
       fetchSectores();
@@ -86,226 +74,185 @@ import {
     };
   
     const getTitle = async (text) => {
-      await axiosApi
-        .post(
-          "/text",
-          { text: text },
-          { headers: { "Content-Type": "application/json" } }
-        )
-        .then((response) => {
-          const res = response.data.trim();
-          if (res === "No está relacionado.") {
-            setMessage(res);
-            setDialogError(true);
-          } else {
-            calcularHaversine(res);
-          }
-        })
-        .catch((error) => {
-          if (error.response) {
-            console.error("Error del servidor:", error.response.data.message);
-          } else if (error.request) {
-            console.error("No se recibió respuesta del servidor.");
-          } else {
-            console.error("Error al configurar la solicitud:", error.message);
-          }
-        });
-    };
-  
-    const calcularHaversine = async (title) => {
-      const data = {
-        sectores: sectores,
-        coordenadas: location,
-        titulo: title,
-      };
-      await axiosApi
-        .post("/haversine", { data: data })
-        .then((response) => {
-          setDatos(response.data);
-          setDialog(true);
-        })
-        .catch((error) => {
-          if (error.response) {
-            setMessage(error.response.data.message);
-            setDialogError(true);
-          } else if (error.request) {
-            console.error("No se recibió respuesta del servidor.");
-          } else {
-            console.error("Error al configurar la solicitud:", error.message);
-          }
-          setDialogError(true);
-        });
-    };
-  
-    const handleCancel = () => {
-      setDatos(null);
-      setText("");
-      setDialog(false);
-    };
-  
-    return (
-      <View style={styles.container} behavior={"height"}>
-        <StatusBar backgroundColor="#6200ee" barStyle="light-content" hidden={false} />
-        <DialogScreen
-          status={dialogError}
-          titulo="Advertencia!"
-          descripcion={message}
-          eventCancel={() => setDialogError(false)}
-        />
-        {datos ? (
-          <DialogScreen
-            status={dialog}
-            titulo={datos["title"]}
-            descripcion={
-              <>
-                <Text>La alerta se envió a los siguientes sectores:</Text>
-                {datos["sectores"].map((itemA, index) => (
-                  <Text key={index} style={{ fontWeight: "bold" }}>
-                    " {itemA["name"]} "
-                  </Text>
-                ))}
-                <Text style={styles.origen}>
-                  {"\n"}Origen{"\n"}Latitud: {datos["origen"]["latitude"]}
-                  {"\n"}Longitud: {datos["origen"]["longitude"]}
-                </Text>
-              </>
+        await axiosApi.post("/text", {
+            text: text
+        }, {
+            headers: {
+                "Content-Type": "application/json"
             }
-            eventCancel={handleCancel}
-          />
-        ) : null}
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {location ? (
-            <MapView style={styles.map} initialRegion={mapRegion}>
-              <Marker coordinate={location} />
-              <Circle
-                center={location}
-                radius={radius}
-                strokeColor="rgba(0, 0, 255, 0.5)"
-                fillColor="rgba(0, 0, 255, 0.2)"
-              />
-              {sectores.map((sector, index) => (
-                <Marker
-                  key={index}
-                  coordinate={{ latitude: sector.latitud, longitude: sector.longitud }}
-                  onPress={() => navigation.navigate("AlarmaDetalle", { sector })}
-                >
-                  <Icon name="alarm" size={20} color="blue" />
-                </Marker>
-              ))}
-            </MapView>
-          ) : (
-            <Text style={styles.text}>Obteniendo ubicación...</Text>
-          )}
-  
-          <View style={styles.alarmBox}>
-            <Text style={styles.alarmTitle}>
-              Alarmas Comunitarias Registradas en el sector:
-            </Text>
-            {sectores.map((sector, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.alarmItem}
-                onPress={() => navigation.navigate("AlarmaDetalle", { sector })}
-              >
-                <Icon name="notifications" size={20} color="blue" />
-                <View>
-                  <Text style={styles.alarmName}>{sector.id}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate("AgregarAlarma")}
-            >
-              <Icon name="add" size={40} color="white" />
-            </TouchableOpacity>
-          </View>
-  
-          <KeyboardAvoidingView behavior="height" keyboardVerticalOffset={60}>
-            <View style={styles.generateAlarm}>
-              <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Mensaje..."
-                  value={text}
-                  onChangeText={(value) => setText(value)}
-                />
-                {/* Al pulsar el ícono del micrófono se muestra el modal de grabación */}
-                <TouchableOpacity onPress={() => setShowVoiceModal(true)}>
-                  <Icon name="mic" size={30} color="blue" />
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={styles.generateButton}
-                onPress={() => {
-                  if (text) {
-                    getTitle(text);
-                  }
-                }}
-              >
-                <Text style={styles.generateButtonText}>Generar</Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </ScrollView>
-  
-        {/* Modal para grabar voz */}
-        {showVoiceModal && (
-          <VoiceRecorderModal
-            onClose={() => setShowVoiceModal(false)}
-            calcularHaversine={calcularHaversine}
-            setMessage={setMessage}
-            setDialogError={setDialogError}
-          />
-        )}
-      </View>
-    );
-  }
-  
-  // Componente WaveVisualizer: visualización de barras animadas (ondas)
-  function WaveVisualizer() {
-    const numBars = 5;
-    const bars = useRef(
-      Array.from({ length: numBars }, () => new Animated.Value(1))
-    ).current;
-  
-    useEffect(() => {
-      const animateBar = (bar, delay) => {
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(bar, {
-              toValue: 2,
-              duration: 300,
-              delay: delay,
-              useNativeDriver: true,
-            }),
-            Animated.timing(bar, {
-              toValue: 1,
-              duration: 300,
-              useNativeDriver: true,
-            }),
-          ])
-        ).start();
-      };
-  
-      bars.forEach((bar, index) => {
-        animateBar(bar, index * 100);
-      });
-    }, [bars]);
+        })
+            .then((response) => {
+                const res = response.data.trim()
+                if (res == "No está relacionado.") {
+                    setMessage(res)
+                    setDialogError(true)
+                }
+                else {
+                    calcularHaversine(res)
+                }
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.error('Error del servidor:', error.response.data.message);
+                } else if (error.request) {
+                    console.error('No se recibió respuesta del servidor.');
+                } else {
+                    console.error('Error al configurar la solicitud:', error.message);
+                }
+            })
+    }
+
+    const calcularHaversine = async (title) => {
+        const data = {
+            "sectores": sectores,
+            "coordenadas": location,
+            "titulo": title
+        }
+        await axiosApi.post("/haversine", {
+            data: data
+        })
+            .then((response) => {
+                setDatos(response.data)
+                setDialog(true)
+            })
+            .catch((error) => {
+                if (error.response) {
+                    setMessage(error.response.data.message)
+                    setDialogError(true)
+                } else if (error.request) {
+                    console.error('No se recibió respuesta del servidor.');
+                } else {
+                    console.error('Error al configurar la solicitud:', error.message);
+                }
+                setDialogError(true)
+            })
+    }
+
+    const handleCancel = () => {
+        setDatos(null)
+        setText("")
+        setDialog(false);
+        navigation.navigate("CamaraIP")
+    };
   
     return (
-      <View style={waveStyles.container}>
-        {bars.map((bar, index) => (
-          <Animated.View
-            key={index}
-            style={[
-              waveStyles.bar,
-              { transform: [{ scaleY: bar }] },
-            ]}
-          />
-        ))}
-      </View>
+        <View
+            style={styles.container}
+            behavior={"height"}
+        >
+            <StatusBar
+                backgroundColor="#6200ee"
+                barStyle="light-content"
+                hidden={false}
+            />
+            <DialogScreen
+                status={dialogError}
+                titulo="Advertencia!"
+                descripcion={message}
+                eventCancel={() => setDialogError(false)}
+            />
+            {datos ?
+                <DialogScreen
+                    status={dialog}
+                    titulo={datos["title"]}
+                    descripcion={
+                        <>
+                            <Text>La alerta se envió a los siguientes sectores:</Text>
+                            {datos["sectores"].map(
+                                (itemA, index) => (
+                                    <Text key={index} style={{ fontWeight: "bold" }}> "{itemA["name"]}" </Text>
+                                ))}
+                            <Text style={styles.origen}>
+                                <Text>{"\n"}Origen</Text>{"\n"}
+                                Latitud: {datos["origen"]["latitude"]}{"\n"}
+                                Longitud: {datos["origen"]["longitude"]}
+                            </Text>
+                        </>
+                    }
+                    eventCancel={handleCancel}
+                />
+                : null
+            }
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {location ? (
+                    <MapView style={styles.map} initialRegion={mapRegion}>
+                        <Marker coordinate={location} />
+                        <Circle
+                            center={location}
+                            radius={radius}
+                            strokeColor="rgba(0, 0, 255, 0.5)"
+                            fillColor="rgba(0, 0, 255, 0.2)"
+                        />
+                        {sectores.map((sector, index) => (
+                            <Marker
+                                key={index}
+                                coordinate={{ latitude: sector.latitud, longitude: sector.longitud }}
+                                onPress={() => navigation.navigate("SectorDetalle", { sector })}
+                            >
+                                <Icon name="alarm" size={20} color="blue" />
+                            </Marker>
+                        ))}
+                    </MapView>
+                ) : (
+                    <Text style={styles.text}>Obteniendo ubicación...</Text>
+                )}
+
+                <View style={styles.alarmBox}>
+                    <Text style={styles.alarmTitle}>Alarmas Comunitarias Registradas en el sector:</Text>
+                    {sectores.map((sector, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.alarmItem}
+                            onPress={() => navigation.navigate("SectorDetalle", { sector })}
+                        >
+                            <Icon name="notifications" size={20} color="blue" />
+                            <View>
+                                <Text style={styles.alarmName}>{sector.id}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity
+                        style={styles.addButton}
+                        onPress={() => navigation.navigate("AgregarSector")}
+                    //onPress={() => navigation.navigate("CamaraIP")}
+                    >
+                        <Icon name="add" size={40} color="white" />
+                    </TouchableOpacity>
+                </View>
+
+                <KeyboardAvoidingView
+                    behavior='height'
+                    keyboardVerticalOffset={60}
+                >
+                    <View style={styles.generateAlarm}>
+                        <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Mensaje..."
+                                value={text}
+                                onChangeText={(value) => setText(value)}
+                            />
+                            <TouchableOpacity onPress={() => navigation.navigate("Microphone")}>
+                                <Icon name="mic" size={30} color="blue" />
+                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity
+                            style={styles.generateButton}
+                            onPress={() => {
+                                if (text) {
+                                    getTitle(text)
+                                }
+                            }}
+                        >
+                            <Text style={styles.generateButtonText}>Generar</Text>
+
+                        </TouchableOpacity>
+
+                    </View>
+                </KeyboardAvoidingView>
+            </ScrollView>
+        </View>
     );
   }
   

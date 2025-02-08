@@ -7,7 +7,7 @@ import Login from './src/screens/Login';
 import Microphone from './src/screens/Microphone';
 import CamaraIP from './src/screens/CamaraIP';
 import AgregarSector from "./src/screens/AgregarSector";
-import AlarmaDetalle from "./src/screens/AlarmaDetalle";
+import SectorDetalle from "./src/screens/SectorDetalle";
 
 const Stack = createStackNavigator();
 
@@ -36,14 +36,14 @@ const App = () => {
           options={{ title: 'Acceso a Ubicación' }}
         />
         <Stack.Screen
-          name="AgregarAlarma"
+          name="AgregarSector"
           component={AgregarSector} // Se crea un nuevo sector
-          options={{ title: 'AgregarAlarma' }}
+          options={{ title: 'AgregarSector' }}
         />
          <Stack.Screen
-          name="AlarmaDetalle"
-          component={AlarmaDetalle}
-          options={{ title: 'AlarmaDetalle' }}
+          name="SectorDetalle"
+          component={SectorDetalle}
+          options={{ title: 'SectorDetalle' }}
         />
         <Stack.Screen
           name="Microphone"

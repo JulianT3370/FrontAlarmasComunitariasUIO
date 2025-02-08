@@ -2,11 +2,13 @@ import { axiosApi } from "./axiosFlask";
 
 export const handleSector = async ({ newSector }) => {
     try {
-        await axiosApi.post("/sendSector", {
+        const response = await axiosApi.post("/sendSector", {
             data: newSector
         });
+        return response.data.message
     } catch (error) {
-        console.error("Error sending sector data:", error);
-        throw error;
+        if (error.response) {
+            return error.response.data.message
+        }
     }
 }
