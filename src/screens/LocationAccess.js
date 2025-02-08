@@ -187,7 +187,7 @@ function LocationAccess() {
     pulseAnim.setValue(1);
   };
 
-  // Función para iniciar la grabación mientras se mantiene presionado
+  // Función para iniciar la grabación 
   const handleStartRecording = () => {
     setIsRecording(true);
     setRecordingTime(0);
