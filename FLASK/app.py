@@ -96,41 +96,63 @@ def calcularDistancia():
         clat = coordenadas["latitude"]
         clon = coordenadas["longitude"]
         distancia = formula(float(lat), float(lon), clat, clon, 6371)
-        result["name"] = sector["id"]
-        if(distancia > 45):
-            continue
-        result["status"] = distancia <= 45
-        distancias.append(result)
+        if(distancia <= 45):
+            result["name"] = sector["id"]
+            result["status"] = distancia <= 45
+            distancias.append(result)
         
     if(len(distancias) < 1):
         return jsonify({"message" : "No hay sectores cerca"}), 400
+        
     datos["sectores"] = distancias
     datos["title"] = titulo
     datos["origen"] = coordenadas
-    return jsonify(datos)
+    try:
+        fetchAlarm(datos)
+        return datos
+    except:
+        return jsonify({"message" : "Error inesperado"}),400
+    
+# @app.route("/alarma", methods = ["POST"])
+def fetchAlarm(datos):
+    data = datos
+    titulo = data["title"]
+    latitud = data["origen"]["latitude"]
+    longitud = data["origen"]["longitude"]
+    alarma = db.collection("alarmas").document()
+    alarma.set({ "titulo" : titulo, "latitud" : float(latitud), "longitud" : float(longitud) })
+    sectores = data["sectores"]
+    print(sectores)
+    for sector in sectores:
+        if(sector["status"]):
+            sector_alarma = db.collection("sector_alarma").document()
+            sector_alarma.set({ "alarma_id": alarma.id, "sector_name": sector["name"] })
 
 @app.route("/sendSector", methods=["POST"])
 def sendSector():
     data = request.json.get("data")
     nombre = data["name"]
 
-    sector = db.collection("sectores").document(nombre)
-    validSec = sector.get()
+    try:
+        sector = db.collection("sectores").document(nombre)
+        validSec = sector.get()
 
-    if(validSec.exists):
-        return jsonify({ "message" : "El sector com el nombre " + nombre + " ya se encuentra registrado." }), 400
-    else:
-        latitud = data["latitude"]
-        longitud = data["longitude"]
-        camara_data = data.get("camera")
-        if(camara_data):
-            ipCam = data["camera"]["ip"]
-            usr = data["camera"]["user"]
-            pas = data["camera"]["password"]
-            sector.set({ "latitud" : latitud, "longitud" : longitud, "ip_camara" : ipCam, "usuario" : usr, "password" : pas })
+        if(validSec.exists):
+            return jsonify({ "message" : "El sector con el nombre " + nombre + " ya se encuentra registrado." }), 400
         else:
-            sector.set({ "latitud" : latitud, "longitud" : longitud })
-        return jsonify({"message" : "Se ha registrado el sector"})
+            latitud = data["latitude"]
+            longitud = data["longitude"]
+            camara_data = data.get("camera")
+            if(camara_data):
+                ipCam = data["camera"]["ip"]
+                usr = data["camera"]["user"]
+                pas = data["camera"]["password"]
+                sector.set({ "latitud" : latitud, "longitud" : longitud, "ip_camara" : ipCam, "usuario" : usr, "password" : pas })
+            else:
+                sector.set({ "latitud" : latitud, "longitud" : longitud })
+            return jsonify({"message" : "El sector " + nombre + " se ha registrado el sector"})
+    except:
+        return jsonify({"message" : "Ha ocurrido un error."}), 400
 
 @app.route("/fgetSectores", methods = ["GET"])
 def getSectoresFirebase():
@@ -141,21 +163,6 @@ def getSectoresFirebase():
         sectores.append({ "id": doc.id, **doc.to_dict() })
 
     return jsonify(sectores)
-
-@app.route("/alarma", methods = ["POST"])
-def fetchAlarm():
-    data = request.json.get("data")
-    titulo = data["title"]
-    latitud = data["origen"]["latitude"]
-    longitud = data["origen"]["longitude"]
-    alarma = db.collection("alarmas").document()
-    alarma.set({ "titulo" : titulo, "latitud" : float(latitud), "longitud" : float(longitud) })
-    sectores = data["sectores"]
-    print(sectores)
-    for sector in sectores:
-        sector_alarma = db.collection("sector_alarma").document()
-        sector_alarma.set({ "alarma_id": alarma.id, "sector_name": sector["name"] })
-    return jsonify({"message" : "Se ha registrado el alarma"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)

@@ -3,13 +3,12 @@ import * as Location from "expo-location";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import styles from "../styles/LocationAccessStyles";
 import { axiosApi } from "../services/axiosFlask";
 import DialogScreen from "../partials/DialogScreen";
 import { getSectores } from "../services/getSectores";
-import { postAlarma } from "../services/sendAlarma";
 
 export default function LocationAccess() {
     const navigation = useNavigation();
@@ -19,7 +18,7 @@ export default function LocationAccess() {
     const [datos, setDatos] = useState(null);
     const [dialog, setDialog] = useState(false);
     const [dialogError, setDialogError] = useState(false);
-    const [dialogAdv, setDialogAdv] = useState(false);
+    const [message, setMessage] = useState("");
     const [sectores, setSectores] = useState([]);
     const radius = 45;
 
@@ -28,9 +27,11 @@ export default function LocationAccess() {
         setSectores(data)
     }
 
-    useFocusEffect(() => {
-        fetchSectores()
-    });
+    useFocusEffect(
+        useCallback(() => {
+            fetchSectores();
+        }, [])
+    );
 
     useEffect(() => {
         requestLocationPermission();
@@ -72,7 +73,6 @@ export default function LocationAccess() {
     };
 
     const getTitle = async (text) => {
-        console.log("Enviando descripción")
         await axiosApi.post("/text", {
             text: text
         }, {
@@ -83,7 +83,7 @@ export default function LocationAccess() {
             .then((response) => {
                 const res = response.data.trim()
                 if (res == "No está relacionado.") {
-                    console.log("no se relaciona con seguridad comunitaria")
+                    setMessage(res)
                     setDialogError(true)
                 }
                 else {
@@ -109,24 +109,22 @@ export default function LocationAccess() {
         }
         await axiosApi.post("/haversine", {
             data: data
-        }, {}).then((response) => {
-            setDatos(response.data)
-            sendAlarma(response.data)
         })
+            .then((response) => {
+                setDatos(response.data)
+                setDialog(true)
+            })
             .catch((error) => {
                 if (error.response) {
-                    setDialogAdv(true)
-                    console.error('Error del servidor:', error.response.data.message);
+                    setMessage(error.response.data.message)
+                    setDialogError(true)
                 } else if (error.request) {
                     console.error('No se recibió respuesta del servidor.');
                 } else {
                     console.error('Error al configurar la solicitud:', error.message);
                 }
+                setDialogError(true)
             })
-    }
-
-    const sendAlarma = async (datos) => {
-        await postAlarma({ datos, setDialog })
     }
 
     const handleCancel = () => {
@@ -145,6 +143,12 @@ export default function LocationAccess() {
                 barStyle="light-content"
                 hidden={false}
             />
+            <DialogScreen
+                status={dialogError}
+                titulo="Advertencia!"
+                descripcion={message}
+                eventCancel={() => setDialogError(false)}
+            />
             {datos ?
                 <DialogScreen
                     status={dialog}
@@ -152,14 +156,9 @@ export default function LocationAccess() {
                     descripcion={
                         <>
                             <Text>La alerta se envió a los siguientes sectores:</Text>
-                            {sectores
-                                .filter((itemA) => {
-                                    return datos["sectores"].some(
-                                        (item) => itemA["id"] === item["name"] && item["status"] === true
-                                    );
-                                })
-                                .map((itemA, index) => (
-                                    <Text key={index} style={{ fontWeight: "bold" }}> "{itemA["id"]}" </Text>
+                            {datos["sectores"].map(
+                                (itemA, index) => (
+                                    <Text key={index} style={{ fontWeight: "bold" }}> "{itemA["name"]}" </Text>
                                 ))}
                             <Text style={styles.origen}>
                                 <Text>{"\n"}Origen</Text>{"\n"}
@@ -172,18 +171,6 @@ export default function LocationAccess() {
                 />
                 : null
             }
-            <DialogScreen
-                status={dialogError}
-                titulo="Error"
-                descripcion="El texto proporcionado no se relaciona con seguridad comunitaria."
-                eventCancel={() => setDialogError(false)}
-            />
-            <DialogScreen
-                status={dialogAdv}
-                titulo="Advertencia!"
-                descripcion="No se encuentran sectores cercanos."
-                eventCancel={() => setDialogAdv(false)}
-            />
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {location ? (
                     <MapView style={styles.map} initialRegion={mapRegion}>
@@ -233,7 +220,7 @@ export default function LocationAccess() {
 
                 <KeyboardAvoidingView
                     behavior='height'
-                    //keyboardVerticalOffset={60}
+                    keyboardVerticalOffset={60}
                 >
                     <View style={styles.generateAlarm}>
                         <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
