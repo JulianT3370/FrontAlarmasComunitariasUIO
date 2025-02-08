@@ -180,7 +180,7 @@ function LocationAccess() {
       ])
     ).start();
   };
-
+  //animacion de pulso en icono de micrófono
   // Función para detener la animación de pulso
   const stopPulse = () => {
     pulseAnim.stopAnimation();
