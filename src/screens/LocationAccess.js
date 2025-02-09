@@ -10,6 +10,7 @@ import { axiosApi } from "../services/axiosFlask";
 import DialogScreen from "../partials/DialogScreen";
 import { getSectores } from "../services/getSectores";
 import CamaraIP from "./CamaraIP";
+import { deleteSector } from "../services/deleteSector";
 
 export default function LocationAccess() {
     const navigation = useNavigation();
@@ -18,7 +19,7 @@ export default function LocationAccess() {
     const [text, setText] = useState("");
     const [datos, setDatos] = useState(null);
     const [dialog, setDialog] = useState(false);
-    const [dialogError, setDialogError] = useState(false);
+    const [dialogResponse, setDialogResponse] = useState(false);
     const [message, setMessage] = useState("");
     const [sectores, setSectores] = useState([]);
     const radius = 45;
@@ -85,7 +86,7 @@ export default function LocationAccess() {
                 const res = response.data.trim()
                 if (res == "No está relacionado.") {
                     setMessage(res)
-                    setDialogError(true)
+                    setDialogResponse(true)
                 }
                 else {
                     calcularHaversine(res)
@@ -118,13 +119,13 @@ export default function LocationAccess() {
             .catch((error) => {
                 if (error.response) {
                     setMessage(error.response.data.message)
-                    setDialogError(true)
+                    setDialogResponse(true)
                 } else if (error.request) {
                     console.error('No se recibió respuesta del servidor.');
                 } else {
                     console.error('Error al configurar la solicitud:', error.message);
                 }
-                setDialogError(true)
+                setDialogResponse(true)
             })
     }
 
@@ -134,6 +135,15 @@ export default function LocationAccess() {
         setDialog(false);
         navigation.navigate("CamaraIP")
     };
+
+    const deleteS = (sector_name) => {
+        const response = deleteSector({ sector_name })
+        if (response) {
+            setMessage(response)
+            setDialogResponse(true)
+            fetchSectores()
+        }
+    }
 
     return (
         <View
@@ -146,10 +156,10 @@ export default function LocationAccess() {
                 hidden={false}
             />
             <DialogScreen
-                status={dialogError}
+                status={dialogResponse}
                 titulo="Advertencia!"
                 descripcion={message}
-                eventCancel={() => setDialogError(false)}
+                eventCancel={() => setDialogResponse(false)}
             />
             {datos ?
                 <DialogScreen
@@ -209,6 +219,9 @@ export default function LocationAccess() {
                             <View>
                                 <Text style={styles.alarmName}>{sector.id}</Text>
                             </View>
+                            <TouchableOpacity onPress={ () => deleteS(sector.id) } style = {{ flex:1, alignItems:"flex-end" }}>
+                                <Icon name = "delete" size = {20} color = "red" />
+                            </TouchableOpacity >
                         </TouchableOpacity>
                     ))}
                     <TouchableOpacity

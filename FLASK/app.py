@@ -162,5 +162,12 @@ def getSectoresFirebase():
 
     return jsonify(sectores)
 
+@app.route("/deleteSector", methods = ["POST"])
+def deleteSector():
+    sector_name = request.json.get("sector_name")
+    sector = db.collection("sectores").document(sector_name)
+    result = sector.delete()
+    return jsonify({ "message" : "Sector eliminado de forma exitosa." })
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
