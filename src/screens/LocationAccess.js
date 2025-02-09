@@ -138,6 +138,11 @@ export default function LocationAccess() {
         navigation.navigate("CamaraIP")
     };
 
+    const handleRecordingFinish = (result) => {
+      setText(result); // Actualizar el estado con el texto transcrito
+      calcularHaversine(result); // Llamar a la función para calcular Haversine
+    };
+
     const deleteS = (sector_name) => {
       const response = deleteSector({ sector_name })
       if (response) {
@@ -233,13 +238,6 @@ export default function LocationAccess() {
                     >
                         <Icon name="add" size={40} color="white" />
                     </TouchableOpacity>
-                    <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate('AgregarSector')}
-            //onPress={() => navigation.navigate("CamaraIP")}
-          >
-            <Icon name="add" size={40} color="white" />
-          </TouchableOpacity>
                 </View>
 
         <KeyboardAvoidingView behavior="height" keyboardVerticalOffset={60}>
