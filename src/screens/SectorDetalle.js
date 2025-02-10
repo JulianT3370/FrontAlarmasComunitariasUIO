@@ -1,43 +1,42 @@
-// AlarmaDetalle.js
+// SectorDetalle.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
-const AlarmaDetalle = () => {
+const SectorDetalle = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { alarm } = route.params;
+  const { sector } = route.params;
 
-  if (!alarm) {
+  if (!sector) {
     return (
       <View style={styles.container}>
-        <Text>No se proporcionó ninguna alarma</Text>
+        <Text>No se proporcionó ningun sector</Text>
       </View>
     );
   }
 
-  // Definimos una región centrada en la ubicación de la alarma
+  // Definimos una región centrada en la ubicación del sector
   const region = {
-    latitude: alarm.latitude,
-    longitude: alarm.longitude,
+    latitude: sector.latitud,
+    longitude: sector.longitud,
     latitudeDelta: 0.005,
     longitudeDelta: 0.005,
   };
 
   return (
     <View style={styles.container}>
-      {/* Mapa centrado en la ubicación de la alarma */}
+      {/* Mapa centrado en la ubicación del sector */}
       <MapView style={styles.map} initialRegion={region}>
-        <Marker coordinate={{ latitude: alarm.latitude, longitude: alarm.longitude }} />
+        <Marker coordinate={{ latitude: sector.latitud, longitude: sector.longitud }} />
       </MapView>
 
-      {/* Detalles de la alarma */}
+      {/* Detalles del sector */}
       <View style={styles.detailContainer}>
-        <Text style={styles.title}>{alarm.name}</Text>
-        <Text style={styles.address}>{alarm.address}</Text>
-        <Text>Latitud: {alarm.latitude}</Text>
-        <Text>Longitud: {alarm.longitude}</Text>
+        <Text style={styles.title}>{sector.id}</Text>
+        <Text>Latitud: {sector.latitud}</Text>
+        <Text>Longitud: {sector.longitud}</Text>
         <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Volver</Text>
         </TouchableOpacity>
@@ -77,4 +76,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AlarmaDetalle;
+export default SectorDetalle;

@@ -8,8 +8,8 @@ import AddGroupScreen from './src/screens/AddGroupScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
 import Login from './src/screens/Login';
 import ListaSectores from './src/screens/ListaSectores'; 
-import AgregarAlarma from "./src/screens/AgregarAlarma";
-import AlarmaDetalle from "./src/screens/AlarmaDetalle";// Importa ListaSectores
+import AgregarAlarma from "./src/screens/AgregarSector";
+import AlarmaDetalle from "./src/screens/SectorDetalle";// Importa ListaSectores
 
 
 const Stack = createStackNavigator();
