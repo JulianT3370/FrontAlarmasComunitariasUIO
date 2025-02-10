@@ -197,7 +197,7 @@ function LocationAccess() {
     }, 1000);
   };
 
-  // Función para detener la grabación al soltar el botón
+  // Función para detener 
   const handleStopRecording = () => {
     if (recordingInterval.current) {
       clearInterval(recordingInterval.current);
