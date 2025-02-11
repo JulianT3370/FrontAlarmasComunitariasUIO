@@ -6,3 +6,4 @@ google-cloud-speech==2.30.0
 pydub==0.25.1
 b2sdk==2.7.0
 ffmpeg==1.4
+firebase-admin==6.6.0
