@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView } from "react-native";
-import { useRoute } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { handleSector } from "../services/handleSector";
 import DialogScreen from "../partials/DialogScreen";
@@ -9,9 +8,6 @@ import { AGSectorStyle } from "../styles/AGSectorStyle";
 
 const AgregarSector = () => {
     const navigation = useNavigation();
-    const route = useRoute();
-    // Se recibe el callback para agregar el sector y, opcionalmente, la ubicación actual
-    const { onAddSector, currentLocation } = route.params || {};
 
     // Estados para almacenar los datos del formulario del sector
     const [name, setName] = useState("");
@@ -29,24 +25,19 @@ const AgregarSector = () => {
 
     // Al montar el componente, se obtiene la ubicación actual.
     useEffect(() => {
-        // Si se recibió la ubicación a través de parámetros, se utiliza esa
-        if (currentLocation) {
-            setLatitude(currentLocation.latitude.toString());
-            setLongitude(currentLocation.longitude.toString());
-        } else {
-            // Si no, se solicita la ubicación actual mediante expo-location
-            (async () => {
-                let { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== "granted") {
-                    Alert.alert("Permiso denegado", "No se pudo obtener la ubicación.");
-                    return;
-                }
-                let loc = await Location.getCurrentPositionAsync({});
-                setLatitude(loc.coords.latitude.toString());
-                setLongitude(loc.coords.longitude.toString());
-            })();
-        }
-    }, [currentLocation]);
+        // Si no, se solicita la ubicación actual mediante expo-location
+        const requestLocation = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert("Permiso denegado", "No se pudo obtener la ubicación.");
+                return;
+            }
+            let loc = await Location.getCurrentPositionAsync({});
+            setLatitude(loc.coords.latitude.toString());
+            setLongitude(loc.coords.longitude.toString());
+        };
+        requestLocation()
+    }, []);
 
     const handleAddSector = () => {
         if (name && latitude && longitude) {
@@ -69,9 +60,6 @@ const AgregarSector = () => {
                 const response = handleSector({ newSector });
                 setMessage(response);
                 setVisible(true);
-                if (onAddSector) {
-                    onAddSector(newSector);
-                }
             } catch (error) {
                 setMessage(error.message);
                 setVisible(true);
