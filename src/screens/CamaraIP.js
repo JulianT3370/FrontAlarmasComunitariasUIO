@@ -18,19 +18,5 @@ function CamaraIP() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  webview: {
-    flex: 1,
-  }
-});
 
 export default CamaraIP;
