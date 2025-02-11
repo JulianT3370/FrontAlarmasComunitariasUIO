@@ -2,8 +2,6 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 from flask import Flask, request, jsonify
-# Trabajar con archivos wav
-import wave
 from flask_cors import CORS
 from datetime import datetime
 from haversine import formula
@@ -120,7 +118,6 @@ def fetchAlarm(datos):
     alarma = db.collection("alarmas").document()
     alarma.set({ "titulo" : titulo, "latitud" : float(latitud), "longitud" : float(longitud) })
     sectores = data["sectores"]
-    print(sectores)
     for sector in sectores:
         if(sector["status"]):
             sector_alarma = db.collection("sector_alarma").document()

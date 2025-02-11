@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Modal, View, Text, TouchableOpacity, Alert } from "react-native";
 import { Audio } from "expo-av";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { styleMicrofono } from "../styles/MicrophoneStyle"; // Importamos los estilos
@@ -28,7 +28,7 @@ function Microphone({ visible, onClose, onFinish }) {
             // setPermiso(true);
             startRecording(); // Iniciar la grabación automáticamente
         } else {
-            console.log("Permiso no concedido");
+            Alert.alert("Error", "Permiso no concedido, vaya a sus ajustes y cambie la opción de permisos.");
             // setPermiso(false);
         }
     };
@@ -38,11 +38,11 @@ function Microphone({ visible, onClose, onFinish }) {
         try {
             console.log("Iniciando grabación...");
             // Iniciar la grabación
+            console.log("Grabación iniciada");
             const { recording } = await Audio.Recording.createAsync(
                 Audio.RecordingOptionsPresets.HIGH_QUALITY
             );
             setAudio(recording);
-            console.log("Grabación iniciada");
         } catch (error) {
             console.error("Error al iniciar la grabación", error);
         }

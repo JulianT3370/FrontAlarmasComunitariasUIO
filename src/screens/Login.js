@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet, StatusBar } from "react-native";
+import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StatusBar } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useState } from "react";
 import { LoginStyles } from "../styles/LoginStyle";
@@ -18,6 +18,7 @@ function Login({ navigation }) {
                 hidden={false}           
             />
             <View style={LoginStyles.view}>
+                {/* Carga del logo */}
                 <Image style={LoginStyles.image} source={require("../assets/Logo.png")} />
                 <Text style={LoginStyles.title}>Iniciar Sesión</Text>
                 <Text style={LoginStyles.subtitle}>Bienvenid@</Text>
@@ -25,6 +26,7 @@ function Login({ navigation }) {
                     <View style={LoginStyles.inputWrapper}>
                         <Text style={LoginStyles.label}>Usuario</Text>
                         <View style={LoginStyles.inputView}>
+                            {/* Icono de usuario */}
                             <Icon name="person" size={24} color="gray" />
                             <TextInput
                                 placeholder="Ingrese su usuario"
@@ -35,12 +37,14 @@ function Login({ navigation }) {
                     <View style={LoginStyles.inputWrapper}>
                         <Text style={LoginStyles.label}>Contraseña</Text>
                         <View style={LoginStyles.inputView}>
+                            {/* Icono de candado */}
                             <Icon name="lock" size={24} color="gray" />
                             <TextInput
                                 placeholder="***********"
                                 secureTextEntry={!seePassword}
                                 style={LoginStyles.textInput}
                             />
+                            {/* Cambio de icono si se desea mostrar la constraseña */}
                             <TouchableOpacity onPress={onPress}>
                                 <Icon name={seePassword ? "visibility-off" : "visibility"} size={24} color="gray" />
                             </TouchableOpacity>
