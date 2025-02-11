@@ -11,6 +11,7 @@ import DialogScreen from "../partials/DialogScreen";
 import { getSectores } from "../services/getSectores";
 import CamaraIP from "./CamaraIP";
 import { deleteSector } from "../services/deleteSector";
+import Microphone from './Microphone'; // Importamos el nuevo componente
 
 export default function LocationAccess() {
     const navigation = useNavigation();
@@ -22,57 +23,57 @@ export default function LocationAccess() {
     const [dialogResponse, setDialogResponse] = useState(false);
     const [message, setMessage] = useState("");
     const [sectores, setSectores] = useState([]);
+    const [showVoiceModal, setShowVoiceModal] = useState(false);
     const radius = 45;
 
-    const fetchSectores = async () => {
-        const data = await getSectores()
-        setSectores(data)
+  const fetchSectores = async () => {
+    const data = await getSectores();
+    setSectores(data);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchSectores();
+    }, []),
+  );
+
+  useEffect(() => {
+    requestLocationPermission();
+    fetchSectores();
+  }, []);
+
+  const requestLocationPermission = async () => {
+    const {status} = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      startLocationTracking();
+    } else {
+      console.log('Permiso de ubicación no concedido');
     }
+  };
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchSectores();
-        }, [])
-    );
-
-    useEffect(() => {
-        requestLocationPermission();
-        fetchSectores()
-    }, []);
-
-    const requestLocationPermission = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === "granted") {
-            startLocationTracking();
-        } else {
-            console.log("Permiso de ubicación no concedido");
+  const startLocationTracking = async () => {
+    await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 3000,
+        distanceInterval: 1,
+      },
+      newLocation => {
+        const userLocation = {
+          latitude: newLocation.coords.latitude,
+          longitude: newLocation.coords.longitude,
+        };
+        setLocation(userLocation);
+        if (!mapRegion) {
+          setMapRegion({
+            ...userLocation,
+            latitudeDelta: 0.002,
+            longitudeDelta: 0.002,
+          });
         }
-    };
-
-    const startLocationTracking = async () => {
-        await Location.watchPositionAsync(
-            {
-                accuracy: Location.Accuracy.High,
-                timeInterval: 3000,
-                distanceInterval: 1,
-            },
-            (newLocation) => {
-                const userLocation = {
-                    latitude: newLocation.coords.latitude,
-                    longitude: newLocation.coords.longitude,
-                };
-                setLocation(userLocation);
-
-                if (!mapRegion) {
-                    setMapRegion({
-                        ...userLocation,
-                        latitudeDelta: 0.002,
-                        longitudeDelta: 0.002,
-                    });
-                }
-            }
-        );
-    };
+      },
+    );
+  };
 
     const getTitle = async (text) => {
         await axiosApi.post("/text", {
@@ -80,8 +81,8 @@ export default function LocationAccess() {
         }, {
             headers: {
                 "Content-Type": "application/json"
-            }
-        })
+            },
+        },)
             .then((response) => {
                 const res = response.data.trim()
                 if (res == "No está relacionado.") {
@@ -136,14 +137,19 @@ export default function LocationAccess() {
         navigation.navigate("CamaraIP")
     };
 
+    const handleRecordingFinish = (result) => {
+      setText(result); // Actualizar el estado con el texto transcrito
+      calcularHaversine(result); // Llamar a la función para calcular Haversine
+    };
+
     const deleteS = (sector_name) => {
-        const response = deleteSector({ sector_name })
-        if (response) {
-            setMessage(response)
-            setDialogResponse(true)
-            fetchSectores()
-        }
-    }
+      const response = deleteSector({ sector_name })
+      if (response) {
+          setMessage(response)
+          setDialogResponse(true)
+          fetchSectores()
+      }
+  }
 
     return (
         <View
@@ -233,38 +239,39 @@ export default function LocationAccess() {
                     </TouchableOpacity>
                 </View>
 
-                <KeyboardAvoidingView
-                    behavior='height'
-                    keyboardVerticalOffset={60}
-                >
-                    <View style={styles.generateAlarm}>
-                        <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Mensaje..."
-                                value={text}
-                                onChangeText={(value) => setText(value)}
-                            />
-                            <TouchableOpacity onPress={() => navigation.navigate("Microphone")}>
-                                <Icon name="mic" size={30} color="blue" />
-                            </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity
-                            style={styles.generateButton}
-                            onPress={() => {
-                                if (text) {
-                                    getTitle(text)
-                                }
-                            }}
-                        >
-                            <Text style={styles.generateButtonText}>Generar</Text>
-
-                        </TouchableOpacity>
-
-                    </View>
-                </KeyboardAvoidingView>
-            </ScrollView>
-        </View>
-    );
+        <KeyboardAvoidingView behavior="height" keyboardVerticalOffset={60}>
+          <View style={styles.generateAlarm}>
+            <Text style={styles.generateTitle}>Generar Alarma Comunitaria</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Mensaje..."
+                value={text}
+                onChangeText={value => setText(value)}
+              />
+              <TouchableOpacity onPress={() => setShowVoiceModal(true)}>
+                <Icon name="mic" size={30} color="blue" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.generateButton}
+              onPress={() => {
+                if (text) {
+                  getTitle(text);
+                }
+              }}>
+              <Text style={styles.generateButtonText}>Generar</Text>
+            </TouchableOpacity>
+            {showVoiceModal && (
+                <Microphone
+                    visible={showVoiceModal}
+                    onClose={() => setShowVoiceModal(false)}
+                    onFinish={handleRecordingFinish} // Pasar la función para manejar el resultado
+                />
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </ScrollView>
+    </View>
+  );
 }

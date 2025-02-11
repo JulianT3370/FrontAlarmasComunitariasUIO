@@ -112,83 +112,28 @@ const styles = StyleSheet.create({
   generateButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold'
   },
 
-  formContainer: {
-    width: "100%",
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 20,
-    alignSelf: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
-    elevation: 6,
-    marginVertical: 10,
+  //microfono
+  micButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 15,
+    // Opcional: agregar sombra para iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    // Elevación para Android
+    elevation: 5,
   },
-  inputAlarma: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#FFF",
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 12,
-  },
-  button: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#007AFF",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
-    elevation: 4,
-  },
-  buttonDisabled: {
-    backgroundColor: "#AAA",
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  locationText: {
-    marginTop: 10,
-    textAlign: "center",
-    fontSize: 14,
-    color: "#555",
-  },
+  // ... otros estilos
 
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-    color: "#007AFF",
-    textAlign: "center",
-  },
-  inputIP: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#FFF",
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 12,
-  },
+
 });
 
 export default styles;
