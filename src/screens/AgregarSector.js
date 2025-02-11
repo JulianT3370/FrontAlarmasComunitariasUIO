@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 import { handleSector } from "../services/handleSector";
 import DialogScreen from "../partials/DialogScreen";
 import { useNavigation } from "@react-navigation/native";
+import { AGSectorStyle } from "../styles/AGSectorStyle";
 
 const AgregarSector = () => {
     const navigation = useNavigation();
@@ -81,114 +82,65 @@ const AgregarSector = () => {
     };
 
     return (
-        <View style={{ flex: 1, padding: 20 }}>
+        <View style={AGSectorStyle.container}>
             <DialogScreen
                 titulo="Notificación"
                 descripcion={message}
                 status={visible}
                 eventCancel={() => {
-                    setVisible(false)
-                    navigation.goBack()
+                    setVisible(false);
+                    navigation.goBack();
                 }}
             />
-            <Text style={{ fontSize: 20, marginBottom: 10 }}>Agregar Nuevo Sector</Text>
-            <KeyboardAvoidingView
-                behavior='height'
-            >
+            <Text style={AGSectorStyle.title}>Agregar Nuevo Sector</Text>
+            <KeyboardAvoidingView behavior='height'>
                 <TextInput
                     placeholder="Nombre del sector"
                     value={name}
                     onChangeText={setName}
-                    style={{
-                        borderWidth: 1,
-                        borderColor: "#ccc",
-                        padding: 10,
-                        marginBottom: 10,
-                    }}
+                    style={AGSectorStyle.input}
                 />
-                {/* Los campos de latitud y longitud se obtienen automáticamente y son de solo lectura */}
                 <TextInput
                     placeholder="Latitud"
                     value={latitude}
                     editable={false}
                     keyboardType="numeric"
-                    style={{
-                        borderWidth: 1,
-                        borderColor: "#ccc",
-                        padding: 10,
-                        marginBottom: 10,
-                        backgroundColor: "#f0f0f0",
-                    }}
+                    style={AGSectorStyle.readOnlyInput}
                 />
                 <TextInput
                     placeholder="Longitud"
                     value={longitude}
                     editable={false}
                     keyboardType="numeric"
-                    style={{
-                        borderWidth: 1,
-                        borderColor: "#ccc",
-                        padding: 10,
-                        marginBottom: 10,
-                        backgroundColor: "#f0f0f0",
-                    }}
+                    style={AGSectorStyle.readOnlyInput}
                 />
-
-                {/* Sección opcional para la información de la cámara */}
-                <Text style={{ fontSize: 18, marginVertical: 10 }}>
-                    Información de la Cámara (Opcional)
-                </Text>
+                <Text style={AGSectorStyle.cameraInfoTitle}>Información de la Cámara (Opcional)</Text>
                 <TextInput
                     placeholder="IP de la Cámara"
                     value={cameraIP}
                     onChangeText={setCameraIP}
-                    style={{
-                        borderWidth: 1,
-                        borderColor: "#ccc",
-                        padding: 10,
-                        marginBottom: 10,
-                    }}
+                    style={AGSectorStyle.input}
                 />
                 <TextInput
                     placeholder="Usuario de la Cámara"
                     value={cameraUser}
                     onChangeText={setCameraUser}
-                    style={{
-                        borderWidth: 1,
-                        borderColor: "#ccc",
-                        padding: 10,
-                        marginBottom: 10,
-                    }}
+                    style={AGSectorStyle.input}
                 />
                 <TextInput
                     placeholder="Contraseña de la Cámara"
                     value={cameraPassword}
                     onChangeText={setCameraPassword}
                     secureTextEntry
-                    style={{
-                        borderWidth: 1,
-                        borderColor: "#ccc",
-                        padding: 10,
-                        marginBottom: 10,
-                    }}
+                    style={AGSectorStyle.input}
                 />
-
-                <TouchableOpacity
-                    onPress={handleAddSector}
-                    style={{
-                        backgroundColor: "blue",
-                        padding: 10,
-                        borderRadius: 5,
-                        marginTop: 10,
-                    }}
-                >
-                    <Text style={{ color: "white", textAlign: "center" }}>
-                        Guardar Sector
-                    </Text>
+                <TouchableOpacity onPress={handleAddSector} style={AGSectorStyle.button}>
+                    <Text style={AGSectorStyle.buttonText}>Guardar Sector</Text>
                 </TouchableOpacity>
             </KeyboardAvoidingView>
         </View>
     );
+
 };
 
 export default AgregarSector;

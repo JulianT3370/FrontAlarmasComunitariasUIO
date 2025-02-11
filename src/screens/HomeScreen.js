@@ -1,8 +1,9 @@
 import { View, Image, TouchableOpacity, Text, StatusBar } from 'react-native';
+import { HomeStyles } from '../styles/HomeStyle';
 
 export default function App({ navigation }) {
   return (
-    <View style={style.view}>
+    <View style={HomeStyles.view}>
       <StatusBar
         backgroundColor="#6200ee"
         barStyle="light-content" 
@@ -10,28 +11,9 @@ export default function App({ navigation }) {
       />
       <Image source={require("../assets/Logo.png")} />
 
-      <TouchableOpacity style={style.button} onPress={() => navigation.navigate("Login")}>
-        <Text style={style.buttonText}>Comenzar</Text>
+      <TouchableOpacity style={HomeStyles.button} onPress={() => navigation.navigate("Login")}>
+        <Text style={HomeStyles.buttonText}>Comenzar</Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const style = {
-  view: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-  },
-  button: {
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: "blue",
-    width: "50%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-  },
-};
