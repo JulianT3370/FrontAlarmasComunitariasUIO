@@ -1,7 +1,6 @@
-// LocationAccessStyles.js
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const LocationStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff'
@@ -42,12 +41,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 8,
     borderRadius: 8,
-    // Sombras para iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    // Elevación para Android
     elevation: 2,
   },
   alarmItem: {
@@ -123,17 +116,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 15,
-    // Opcional: agregar sombra para iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    // Elevación para Android
     elevation: 5,
   },
-  // ... otros estilos
 
 
 });
-
-export default styles;
